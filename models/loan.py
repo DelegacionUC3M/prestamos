@@ -9,7 +9,7 @@ class loan (db.Model):
     loan_date = db.Column(db.Date, nullable=False)
     refund_date = db.Column(db.Date)
 
-    def __init__(self, id, item_id, user, amount, loan_date, refund_date):
+    def __init__(self, id, item_id, user, amount, loan_date, refund_date=None):
         self.id = id
         self.item_id = item_id
         self.user = user

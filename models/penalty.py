@@ -7,10 +7,12 @@ class Penalty(db.Model):
     sanction_date = db.Column(db.Date, nullable = False)
     penalty_date = db.Column(db.Date, nullable = False)
 
-    def __init__(self, user=None, sanction_date=None, penalty_date=None):
-        '''Constructor del objeto. Los objetos que no pueden ser nulos los ponemos en False 
+    def __init__(self, id, user, loan_id, sanction_date, penalty_date):
+        '''Constructor del objeto. Los objetos que no pueden ser nulos los ponemos en False
 	para poder crear un objeto vacio con los atributos'''
+        self.id = id
         self.user = user
+	self.loan_id = loan_id
         self.sanction_date = sanction_date
         self.penalty_date = penalty_date
 

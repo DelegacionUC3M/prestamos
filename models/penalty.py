@@ -12,7 +12,7 @@ class Penalty(db.Model):
 	para poder crear un objeto vacio con los atributos'''
         self.id = id
         self.user = user
-	self.loan_id = loan_id
+        self.loan_id = loan_id
         self.sanction_date = sanction_date
         self.penalty_date = penalty_date
 

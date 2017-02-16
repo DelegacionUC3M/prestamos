@@ -1,9 +1,8 @@
 from .connection import db
 
-class loan (db.Model):
-
-    id = db.Column(db.Integer,primary_Key=True,autoincrement=1)
-    item_id = db.Column(db.Integer, db.ForeignKey ('item.id'))
+class Loan(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=1)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
     user = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     loan_date = db.Column(db.Date, nullable=False)
@@ -18,5 +17,5 @@ class loan (db.Model):
         self.refund_date = refund_date
 
     def __repr__(self):
-        return {'id':self.id, 'item_id':self.item_id, 'user':self.user, 
+        return {'id':self.id, 'item_id':self.item_id, 'user':self.user,
                     'amount':self.amount, 'loan_date':self.loan_date, 'refund_date':self.refund_date}

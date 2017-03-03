@@ -17,10 +17,10 @@ class Penalty(db.Model):
 
     def __repr__(self):
         '''Imprime los datos del objeto de forma mas elegante'''
-        return{
+        return str({
             'id':self.id,
             'user':self.user,
             'loan_id':self.loan_id,
             'sanction_date':self.sanction_date,
             'penalty_date':self.penalty_date
-        }
+        })

@@ -9,7 +9,7 @@ class Item(db.Model):
     # barcode = db.Column()
     state = db.Column(db.Text, nullable=False)
     loan_days = db.Column(db.Integer, nullable=False)
-    penalty_coefficient = db.Column(db.Double, nullable=False)
+    penalty_coefficient = db.Column(db.Float, nullable=False)
 
     def __init__(self, name=None, amount=None, type=None, penalty_coefficient=None, state=None, loan_days=None):
         self.name = name

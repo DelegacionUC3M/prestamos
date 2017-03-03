@@ -1,16 +1,15 @@
 from .connection import db
 
 class Penalty(db.Model):
-    id = db.Column(db.Integer, primary_key = True, autoincrement = 1)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column(db.Integer, nullable=False)
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
-    sanction_date = db.Column(db.Date, nullable = False)
-    penalty_date = db.Column(db.Date, nullable = False)
+    sanction_date = db.Column(db.Date, nullable=False)
+    penalty_date = db.Column(db.Date, nullable=False)
 
-    def __init__(self, id, user, loan_id, sanction_date, penalty_date):
+    def __init__(self, user, loan_id, sanction_date, penalty_date):
         '''Constructor del objeto. Los objetos que no pueden ser nulos los ponemos en False
 	para poder crear un objeto vacio con los atributos'''
-        self.id = id
         self.user = user
         self.loan_id = loan_id
         self.sanction_date = sanction_date

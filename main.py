@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request
+=======
+from flask import Flask, render_template
+>>>>>>> 9bf1fc45681daf34430e53e0be0369cb7e59df21
 from models.connection import db
 
 # Inicializacion del objeto Flask
@@ -21,6 +25,10 @@ def loan_create():
 	if request.method == 'POST':
 		return render_template("index.html")
 	return render_template("loan_create.html")
+
+@app.route('/objeto/crear')
+def item_create():
+    return render_template('item_create.html')
 
 if __name__ == '__main__':
     app.run()

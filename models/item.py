@@ -26,6 +26,6 @@ class Item(db.Model):
             'amount': self.amount,
             'type': self.type,
             'state': self.state,
-            'loan_days': self.loan_dates,
+            'loan_days': self.loan_days,
             'penalty_coefficient': self.penalty_coefficient
         })

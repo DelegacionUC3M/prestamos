@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from models.connection import db
 
 # Inicializacion del objeto Flask
@@ -15,6 +15,11 @@ db.init_app(app)
 @app.route('/')
 def index():
     return 'Hola mundo'
+
+
+@app.route('/objeto/crear')
+def item_create():
+    return render_template('item_create.html')
 
 if __name__ == '__main__':
     app.run()

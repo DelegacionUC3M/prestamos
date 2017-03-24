@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, request
-=======
-from flask import Flask, render_template
->>>>>>> 9bf1fc45681daf34430e53e0be0369cb7e59df21
 from models.connection import db
 
 # Inicializacion del objeto Flask

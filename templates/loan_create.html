@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html>
 	<head>
+        <meta charset="UTF-8">
+        <title>Crear préstamo</title>
 	</head>
 
 	<body>
-		<form action="?" method="POST">
+		<form action="{{ request.path }}" method="POST">
 			Usuario:
 			<input type="number" name="user" placeholder="NIA">
-			
+
+            Objeto:
+			<select name="comp_select">
+                {% for item in items %}
+				<option value="{{ item.id }}">{{ item.name }} / {{ item.amount }} / {{ item.state }}</option>
+                {% endfor %}
+			</select>
+
 			Cantidad:
-			<input type="number" name="amount" placeholder="">
-			
-			Objeto: 
-			<select>
-				<option>Select a type</option>
-			</select>	
-			
+			<input type="number" name="amount" placeholder="Cantidad">
+
+            Fecha préstamo:
+            <input type="date" name="loan_date" placeholder="Fecha préstamo">
 
 			<input type="submit" value="Submit">
 		</form> 

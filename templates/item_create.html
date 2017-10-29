@@ -1,12 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Crear objeto</title>
 </head>
+
 <body>
-<header></header>
-<section></section>
-<footer></footer>
+    <form action="{{ request.path }}" method="POST">
+        Nombre:
+        <input type="text" name="name" placeholder="Nombre">
+
+        Cantidad:
+        <input type="number" min="0" name="amount" placeholder="Cantidad">
+
+        Tipo:
+        <input type="text" name="type" placeholder="Tipo de objeto">
+
+        Estado:
+        <input type="text" name="state" placeholder="Defectuoso, funciona...">
+
+        Dias préstamo:
+        <input type="number" min="0" name="loan_days" placeholder="Duración max préstamo">
+
+        Ratio penalización:
+        <input type="number" min="0" max="1" step="0.1" name="penalty_coefficient" placeholder="Ratio penalización">
+
+        <input type="submit" value="Submit">
+    </form>
+
 </body>
 </html>

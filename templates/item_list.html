@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Listar objetos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+</head>
+
+<body>
+    <a href="{{ url_for('index') }}">Página principal</a><br>
+
+    {% for item in items %}
+        <li>{{ item.name }} - {{ item.amount }} - {{ item.state }} - {{ item.loan_days }} - {{ item.penalty_coefficient }}</li>
+    {% endfor %}
+
+
+</body>
+</html>

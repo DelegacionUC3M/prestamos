@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Listar objetos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+</head>
+
+<body>
+    <a href="{{ url_for('index') }}">Página principal</a><br>
+    
+    {% for loan in loans %}
+        <li>{{ loan.id }} - {{ loan.user }} - {{ loan.amount }} - {{ loan.loan_date }} - {{ loan.refund_date }}</li>
+    {% endfor %}
+
+
+</body>
+</html>

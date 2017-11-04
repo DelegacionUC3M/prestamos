@@ -14,11 +14,10 @@ db.app = app
 db.init_app(app)
 db.create_all()
 
-
 # Url /
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("index.html", items = item.Item.query.all(), loans = loan.Loan.query.all())
 
 @app.route('/prestamo/create', methods=['GET','POST'])
 def loan_create():
@@ -31,11 +30,13 @@ def loan_create():
                                   request.form['loan_date'], refund_date)
         db.session.add(prestamo_data)
         db.session.commit()
-        return render_template("index.html")
+        return render_template("index.html", items = item.Item.query.all())
     else:
         return render_template("loan_create.html", items = item.Item.query.all())
 
-
+@app.route('/prestamo/listar', methods=['GET'])
+def loan_list():
+    return render_template('loan_list.html', loans = loan.Loan.query.all())
 
 @app.route('/objeto/crear', methods=['GET','POST'])
 def item_create():
@@ -46,9 +47,13 @@ def item_create():
 
         db.session.add(loan_item)
         db.session.commit()
-        return render_template("index.html")
+        return render_template("index.html", items = item.Item.query.all())
     else:
         return render_template('item_create.html')
+
+@app.route('/objeto/listar', methods=['GET'])
+def item_list():
+    return render_template('item_list.html', items = item.Item.query.all())
 
 
 if __name__ == '__main__':

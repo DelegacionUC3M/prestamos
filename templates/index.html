@@ -3,10 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Pagina principal</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
 </head>
+
 <body>
-    <a href="{{ url_for('item_create') }}">Create item</a><br>
-    <a href="{{ url_for('loan_create') }}">Create loan</a><br>
+    <div class="to_link">
+        <a href="{{ url_for('item_create') }}">Añadir objeto</a>
+        <a href="{{ url_for('loan_create') }}">Añadir prestamo</a>
+        <a href="{{ url_for('item_list') }}">Listar objetos</a>
+        <a href="{{ url_for('loan_list') }}">Listar prestamos</a>
+    </div>
+
+    <br>
+    <br>
+
+    {% for item in items %}
+        <li>{{ item.name }} - {{ item.amount }} - {{ item.state }}</li>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    {% for loan in loans %}
+        <li>{{ loan.user }} - {{ loan.loan_date }} - {{ loan.refund_date }}</li>
+    {% endfor %}
 
 </body>
 </html>

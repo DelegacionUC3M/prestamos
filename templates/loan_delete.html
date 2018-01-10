@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrar préstamo</title>
+</head>
+
+<body>
+    <form action="{{ request.path }}" method="POST">
+        Préstamo:
+        <select name="comp_select">
+            {% for loan in loans %}
+              {% for item in items%}
+                {% if item.id == loan.item_id %}
+                  <option value="{{ loan.id }}"> {{ item.name }} por {{ loan.user}} en {{ loan.loan_date }}
+                {% endif %}
+              {% endfor%}
+            {% endfor %}
+        </select>
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+</html>

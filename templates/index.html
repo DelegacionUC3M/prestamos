@@ -9,9 +9,12 @@
 <body>
     <div class="to_link">
         <a href="{{ url_for('item_create') }}">Añadir objeto</a>
+        <a href="{{ url_for('item_list') }}">Mostrar objetos</a>
+        <a href="{{ url_for('item_delete') }}">Borrar objeto</a>
+
         <a href="{{ url_for('loan_create') }}">Añadir prestamo</a>
-        <a href="{{ url_for('item_list') }}">Listar objetos</a>
-        <a href="{{ url_for('loan_list') }}">Listar prestamos</a>
+        <a href="{{ url_for('loan_list') }}">Mostrar prestamos</a>
+        <a href="{{ url_for('loan_delete') }}">Borrar prestamos</a>
     </div>
 
     <br>
@@ -25,7 +28,11 @@
     <br>
 
     {% for loan in loans %}
-        <li>{{ loan.user }} - {{ loan.loan_date }} - {{ loan.refund_date }}</li>
+      {% for item in items %}
+        {% if item.id == loan.item_id%}
+        <li>{{ item.name}} : {{ loan.user }} desde {{ loan.loan_date }} hasta {{ loan.refund_date }}</li>
+        {% endif %}
+      {% endfor%}
     {% endfor %}
 
 </body>

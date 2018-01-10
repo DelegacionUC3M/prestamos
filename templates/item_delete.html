@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear objeto</title>
+</head>
+
+<body>
+  <form action="{{ request.path }}" method="POST">
+      Objeto:
+      <select name="comp_select">
+          {% for item in items%}
+            <option value="{{ item.id }}">{{ item.name}} / {{item.amount}} / {{ item.state }}
+          {% endfor %}
+      </select>
+
+      Cantidad:
+      <input type="number" min="0" name="amount" placeholder="Cantidad">
+
+      <input type="submit" value="Submit">
+  </form>
+</body>
+</html>

@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Listar objetos</title>
+    <title>Listar préstamos</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
 </head>
 
 <body>
     <a href="{{ url_for('index') }}">Página principal</a><br>
-    
+
     {% for loan in loans %}
-        <li>{{ loan.id }} - {{ loan.user }} - {{ loan.amount }} - {{ loan.loan_date }} - {{ loan.refund_date }}</li>
+      {% for item in items %}
+        {% if item.id == loan.item_id %}
+          <li>{{ item.name }} - {{ loan.user }} - {{ loan.amount }} - {{ loan.loan_date }} - {{ loan.refund_date }}</li>
+        {% endif %}
+      {% endfor %}
     {% endfor %}
 
 

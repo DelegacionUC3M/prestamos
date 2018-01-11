@@ -28,29 +28,40 @@ def index():
 
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
+    # TODO Al crear un préstamo muestra objetos que ya han sido prestados
     if request.method == 'POST':
         # Objeto/s que se ha prestado
         object = item.Item.query.get(int(request.form.get('comp_select')))
-        if object.amount > int(request.form['amount']):
+
+        # TODO Si se piden mas objetos que los que hay en la db no ocurre nada
+        if object.amount >= int(request.form['amount']):
             # Fecha en la que el objeto se ha prestado
             loan_date = datetime.strptime(request.form['loan_date'],
                                           "%Y-%m-%d")
             # Fecha en la que hay que devolver el objeto
             refund_date = loan_date + timedelta(days=object.loan_days)
-            prestamo_data = loan.Loan(request.form.get('comp_select'),
-                                      int(request.form['user']),
-                                      int(request.form['amount']),
-                                      request.form['loan_date'],
-                                      refund_date)
+            loan_data = loan.Loan(request.form.get('comp_select'),
+                                  int(request.form['user']),
+                                  int(request.form['amount']),
+                                  request.form['loan_date'],
+                                  refund_date)
 
-            db.session.add(prestamo_data)
+            object.amount -= loan_data.amount
+            db.session.add(loan_data)
             db.session.commit()
             return render_template("index.html",
                                    items=item.Item.query.all(),
                                    loans=loan.Loan.query.all())
+        else:
+            error = 'No hay tantos objetos para prestar'
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all(),
+                                   messages=error)
     else:
         return render_template("loan_create.html",
-                               items=item.Item.query.all())
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
 
 
 @app.route('/loan/list', methods=['GET'])
@@ -67,7 +78,8 @@ def loan_delete():
         # cuyo id corresponde con el del formulatio
         deleted_loan = loan.Loan.query.get(
             int(request.form.get('comp_select')))
-
+        object = item.Item.query.get(deleted_loan.item_id)
+        object.amount += deleted_loan.amount
         db.session.delete(deleted_loan)
         db.session.commit()
         return render_template("index.html",

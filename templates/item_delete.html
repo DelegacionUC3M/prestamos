@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crear objeto</title>
+    <title>Borrar objeto</title>
 </head>
 
 <body>
@@ -10,7 +10,7 @@
       Objeto:
       <select name="comp_select">
           {% for item in items%}
-            <option value="{{ item.id }}">{{ item.name}} / {{item.amount}} / {{ item.state }}
+             <option value="{{ item.id }}">{{ item.name}} / {{item.amount}} / {{ item.state }}
           {% endfor %}
       </select>
 

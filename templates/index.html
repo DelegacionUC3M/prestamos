@@ -7,6 +7,14 @@
 </head>
 
 <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <div class="to_link">
         <a href="{{ url_for('item_create') }}">Añadir objeto</a>
         <a href="{{ url_for('item_list') }}">Mostrar objetos</a>
@@ -30,7 +38,7 @@
     {% for loan in loans %}
       {% for item in items %}
         {% if item.id == loan.item_id%}
-        <li>{{ item.name}} : {{ loan.user }} desde {{ loan.loan_date }} hasta {{ loan.refund_date }}</li>
+        <li>{{ item.name}} ({{ loan.amount }}): {{ loan.user }} desde {{ loan.loan_date }} hasta {{ loan.refund_date }}</li>
         {% endif %}
       {% endfor%}
     {% endfor %}

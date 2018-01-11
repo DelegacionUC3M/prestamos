@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar objetos</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+</head>
+
+<body>
+    <a href="{{ url_for('index') }}">Página principal</a>
+
+    <table>
+      <tr>
+          <th>Objeto</th>
+          <th>Cantidad</th>
+          <th>Estado</th>
+          <th>Tipo</th>
+          <th>Duración préstamo</th>
+          <th>% penalizacion</th>
+      </tr>
+    </table>
+    {% for item in items %}
+          [{{ item.id }}]
+          <input type="text" name="name" value="{{ item.name }}">
+          <input type="number" min="0" name="amount" value="{{ item.amount }}">
+          <input type="text" name="amount" value="{{ item.state }}">
+          <input type="text" name="type" value="{{ item.type }}">
+          <input type="number" min="0" name="loan_days" value="{{ item.loan_days }}">
+          <input type="number" min="0" name="penalty_coefficient" value="{{ item.penalty_coefficient }}"><br>
+    {% endfor %}
+
+</body>
+</html>

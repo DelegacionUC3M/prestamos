@@ -15,10 +15,15 @@
       {% endif %}
     {% endwith %}
 
+    {% if error %}
+      <p><strong>Error:</strong> {{ error }}
+    {% endif %}
+
     <div class="to_link">
         <a href="{{ url_for('item_create') }}">Añadir objeto</a>
         <a href="{{ url_for('item_list') }}">Mostrar objetos</a>
         <a href="{{ url_for('item_delete') }}">Borrar objeto</a>
+        <a href="{{ url_for('item_edit') }}">Editar objeto</a>
 
         <a href="{{ url_for('loan_create') }}">Añadir prestamo</a>
         <a href="{{ url_for('loan_list') }}">Mostrar prestamos</a>

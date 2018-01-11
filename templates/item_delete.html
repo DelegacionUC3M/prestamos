@@ -10,12 +10,11 @@
       Objeto:
       <select name="comp_select">
           {% for item in items%}
-             <option value="{{ item.id }}">{{ item.name}} / {{item.amount}} / {{ item.state }}
+            {% if item.amount > 0 %}
+             <option value="{{ item.id }}">{{ item.name}} : {{item.amount}} : {{ item.state }}
+            {% endif %}
           {% endfor %}
       </select>
-
-      Cantidad:
-      <input type="number" min="0" name="amount" placeholder="Cantidad">
 
       <input type="submit" value="Submit">
   </form>

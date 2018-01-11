@@ -9,13 +9,28 @@
 <body>
     <a href="{{ url_for('index') }}">Página principal</a><br>
 
+    <table>
+      <tr>
+          <th>Usuario</th>
+          <th>Objeto prestado</th>
+          <th>Cantidad</th>
+          <th>Fecha del préstamo</th>
+          <th>Fecha devolución</th>
+      </tr>
     {% for loan in loans %}
       {% for item in items %}
         {% if item.id == loan.item_id %}
-          <li>{{ item.name }} - {{ loan.user }} - {{ loan.amount }} - {{ loan.loan_date }} - {{ loan.refund_date }}</li>
+      <tr>
+          <td>{{ loan.user }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ loan.amount }}</td>
+          <td>{{ loan.loan_date }}</td>
+          <td>{{ loan.refund_date }}</td>
+      </tr>
         {% endif %}
       {% endfor %}
     {% endfor %}
+    </table>
 
 
 </body>

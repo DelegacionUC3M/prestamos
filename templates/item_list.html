@@ -9,9 +9,26 @@
 <body>
     <a href="{{ url_for('index') }}">Página principal</a>
 
+    <table>
+      <tr>
+          <th>Objeto</th>
+          <th>Cantidad</th>
+          <th>Estado</th>
+          <th>Tipo</th>
+          <th>Duración préstamo</th>
+          <th>% penalizacion</th>
+      </tr>
     {% for item in items %}
-    <li>{{ item.name }} / {{ item.amount }} / {{ item.state }} / {{ item.loan_days }}</li>
+      <tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.amount }}</td>
+          <td>{{ item.state }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.loan_days }}</td>
+          <td>{{ item.penalty_coefficient }}</td>
+      </tr>
     {% endfor %}
+    </table>
 
 </body>
 </html>

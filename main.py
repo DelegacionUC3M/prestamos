@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash
 from models import item, loan
 from models.connection import db
 from datetime import datetime, timedelta
@@ -8,6 +8,8 @@ app = Flask(__name__)
 
 # Generacion del dict (diccionario) de configuracion desde fichero
 app.config.from_pyfile('config.cfg')
+
+app.secret_key = 'random'
 
 # Enlaza la aplicacion y la base de datos
 db.app = app
@@ -28,12 +30,11 @@ def index():
 
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
-    # TODO Al crear un préstamo muestra objetos que ya han sido prestados
     if request.method == 'POST':
         # Objeto/s que se ha prestado
         object = item.Item.query.get(int(request.form.get('comp_select')))
 
-        # TODO Si se piden mas objetos que los que hay en la db no ocurre nada
+        # Se deben prestar menos objetos de los existentes
         if object.amount >= int(request.form['amount']):
             # Fecha en la que el objeto se ha prestado
             loan_date = datetime.strptime(request.form['loan_date'],
@@ -52,12 +53,13 @@ def loan_create():
             return render_template("index.html",
                                    items=item.Item.query.all(),
                                    loans=loan.Loan.query.all())
+        # Se han prestamo más objetos de los existentes
         else:
             error = 'No hay tantos objetos para prestar'
             return render_template("index.html",
                                    items=item.Item.query.all(),
                                    loans=loan.Loan.query.all(),
-                                   messages=error)
+                                   error=error)
     else:
         return render_template("loan_create.html",
                                items=item.Item.query.all(),
@@ -79,7 +81,9 @@ def loan_delete():
         deleted_loan = loan.Loan.query.get(
             int(request.form.get('comp_select')))
         object = item.Item.query.get(deleted_loan.item_id)
+        # Devuelve los objetos prestados a la db
         object.amount += deleted_loan.amount
+        # Elimina el prestamo de la db
         db.session.delete(deleted_loan)
         db.session.commit()
         return render_template("index.html",
@@ -102,6 +106,7 @@ def item_create():
                               int(request.form['loan_days']),
                               float(request.form['penalty_coefficient']))
 
+        # Añade el objeto a la db
         db.session.add(loan_item)
         db.session.commit()
         return render_template("index.html",
@@ -117,18 +122,36 @@ def item_list():
                            items=item.Item.query.all())
 
 
+@app.route('/object/edit', methods=['GET', 'POST'])
+def item_edit():
+    if request.method == 'POST':
+        return render_template('index.html',
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
+    else:
+        return render_template('item_edit.html',
+                               items=item.Item.query.all())
+
+
+
 @app.route('/object/delete', methods=['GET', 'POST'])
 def item_delete():
     if request.method == 'POST':
-        # Obtiene el objeto de la base de datos cuya id
-        # corresponda con la del formulatio
-        deleted_object = item.Item.query.get(
+        # Obtiene el objeto de la db cuya id
+        # corresponda con la del formulario
+        object = item.Item.query.get(
             int(request.form.get('comp_select')))
+        # Busca el objeto a borrar en la lista de préstamos
+        loan_object = loan.Loan.query.filter_by(
+            item_id=request.form.get('comp_select'))
 
-        db.session.delete(deleted_object)
-        db.session.commit()
-        return render_template("index.html",
-                               items=item.Item.query.all())
+        # Elimina el objeto de la db PERMANENTEMENTE
+        if object.amount > 0:
+            db.session.delete(object)
+            db.session.commit()
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all())
     else:
         return render_template('item_delete.html',
                                items=item.Item.query.all())

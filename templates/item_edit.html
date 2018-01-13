@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <title>Editar objetos</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
 </head>
 
 <body>
     <a href="{{ url_for('index') }}">Página principal</a>
+
+    <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objeto">
+
+    <select id="Opciones">
+      <option value="0">Objeto</option>
+      <option value="1">Cantidad</option>
+      <option value="2">Estado</option>
+      <option value="3">Tipo</option>
+      <option value="4">Duración</option>
+      <option value="5">Coeficiente</option>
+    </select>
 
     <table>
       <tr>

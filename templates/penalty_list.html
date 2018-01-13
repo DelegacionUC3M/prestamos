@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Listar sanciones</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
+</head>
+
+<body>
+    <a href="{{ url_for('index') }}">Página principal</a><br>
+
+    <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar sanción">
+
+    <select id="Opciones">
+      <option value="0">Usuario</option>
+      <option value="1">Objeto</option>
+      <option value="2">Fecha</option>
+    </select>
+
+    <table id="Tabla">
+      <tr>
+          <th>Usuario</th>
+          <th>Objeto</th>
+          <th>Fecha</th>
+      </tr>
+    {% for penalty in penalties %}
+      <tr>
+          <td>{{ penalty.user }}</td>
+          <td>{{ penalty.sanction_date }}</td>
+          <td>{{ penalty.penalty_date }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+
+
+</body>
+</html>

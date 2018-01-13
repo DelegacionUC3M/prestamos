@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, flash
-from models import item, loan
+from flask import Flask, render_template, request
+from models import item, loan, penalty
 from models.connection import db
 from datetime import datetime, timedelta
 
@@ -16,8 +16,16 @@ db.app = app
 db.init_app(app)
 db.create_all()
 
+# TODO
+# Crear una busqueda para eliminar objetos en vez del selector
+# Crear una busqueda para eliminar préstamos en vez del selector
+# Crear un buscador para añadir objetos a los prestamos
+# Actualizar el objeto tras editarlo
 
 @app.route('/', methods=['GET', 'POST'])
+
+
+@app.route('/login', methods=['GET', 'POST'])
 
 
 @app.route('/index', methods=['GET', 'POST'])
@@ -33,7 +41,6 @@ def loan_create():
     if request.method == 'POST':
         # Objeto/s que se ha prestado
         object = item.Item.query.get(int(request.form.get('comp_select')))
-
         # Se deben prestar menos objetos de los existentes
         if object.amount >= int(request.form['amount']):
             # Fecha en la que el objeto se ha prestado
@@ -137,24 +144,34 @@ def item_edit():
 @app.route('/object/delete', methods=['GET', 'POST'])
 def item_delete():
     if request.method == 'POST':
-        # Obtiene el objeto de la db cuya id
-        # corresponda con la del formulario
-        object = item.Item.query.get(
-            int(request.form.get('comp_select')))
+        # Obtiene la lista de objetos seleccionados
+        # Es una lista con los id de las checkboxes
+        deleted_objects = request.form.getlist("objetos")
         # Busca el objeto a borrar en la lista de préstamos
-        loan_object = loan.Loan.query.filter_by(
-            item_id=request.form.get('comp_select'))
-
-        # Elimina el objeto de la db PERMANENTEMENTE
-        if object.amount > 0:
-            db.session.delete(object)
+        for object in deleted_objects:
+            # Elimina el objeto de la db PERMANENTEMENTE
+            db_object = item.Item.query.get(int(object))
+            db.session.delete(db_object)
             db.session.commit()
-            return render_template("index.html",
-                                   items=item.Item.query.all(),
-                                   loans=loan.Loan.query.all())
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        return render_template('item_delete.html',
-                               items=item.Item.query.all())
+        # Dummy variable
+        id_prestamos = []
+
+        for prestamo in loan.Loan.query.all():
+            id_prestamos.append(prestamo.item_id)
+
+        # Si el objeto no está prestado se mostrará
+        free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
+        return render_template('item_delete.html', items=free_items)
+
+
+@app.route('/penalty/list', methods=['GET'])
+def penalty_list():
+    return render_template('penalty_list.html',
+                           penalties=penalty.Penalty.query.all())
 
 
 if __name__ == '__main__':

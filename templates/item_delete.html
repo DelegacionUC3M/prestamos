@@ -7,14 +7,10 @@
 
 <body>
   <form action="{{ request.path }}" method="POST">
-      Objeto:
-      <select name="comp_select">
-          {% for item in items%}
-            {% if item.amount > 0 %}
-             <option value="{{ item.id }}">{{ item.name}} : {{item.amount}} : {{ item.state }}
-            {% endif %}
+      Objeto:<br>
+          {% for item in items %}
+                  <input type="checkbox" id="item_{{item.id}}" name="objetos" value="{{ item.id }}">{{ item.name }} : {{ item.amount }} : {{ item.state }}<br>
           {% endfor %}
-      </select>
 
       <input type="submit" value="Submit">
   </form>

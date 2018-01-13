@@ -4,35 +4,9 @@
     <meta charset="UTF-8">
     <title>Listar préstamos</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
 </head>
 
-<script>
- /* Busca en la tabla el campo seleccionado*/
- /* Para hacer la busqueda case sensitive, eliminar toUpperCase*/
-function searchItem() {
-  var input, filter, table, tr, td, i, select;
-  input = document.getElementById("Buscador");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("Lista_prestamos");
-  tr = table.getElementsByTagName("tr");
-  select = document.getElementById("Opciones");
-
-     // Obtiene el valor del selector
- var option = select.options[select.selectedIndex].value;
-     // Itera sobre los las filas y oculta los elementos que no cumples la búsqueda
-     for (i = 0; i < tr.length; i++) {
-         // Busca en la primera columna, en este caso nombre del objeto
-    td = tr[i].getElementsByTagName("td")[option];
-    if (td) {
-      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-</script>
 <body>
     <a href="{{ url_for('index') }}">Página principal</a><br>
 
@@ -46,7 +20,7 @@ function searchItem() {
       <option value="4">Devolución</option>
     </select>
 
-    <table id="Lista_prestamos">
+    <table id="Tabla">
       <tr>
           <th>Usuario</th>
           <th>Objeto prestado</th>

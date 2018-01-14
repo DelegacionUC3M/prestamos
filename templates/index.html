@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Pagina principal</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
 </head>
 
 <body>
@@ -19,17 +20,31 @@
       <p><strong>Error:</strong> {{ error }}
     {% endif %}
 
-    <div class="to_link">
-        <a href="{{ url_for('item_create') }}">Añadir objeto</a>
-        <a href="{{ url_for('item_list') }}">Mostrar objetos</a>
-        <a href="{{ url_for('item_delete') }}">Borrar objeto</a>
-        <a href="{{ url_for('item_edit') }}">Editar objeto</a>
+    <div class="dropdown">
+      <button onclick="dropDown(0)" class="dropdownbtn">Objetos</button>
+      <div id="dropdown_objects" class="dropdown_objects">
+        <a href="{{ url_for('item_create') }}">Añadir</a>
+        <a href="{{ url_for('item_list') }}">Mostrar</a>
+        <a href="{{ url_for('item_delete') }}">Borrar</a>
+        <a href="{{ url_for('item_edit') }}">Editar</a>
+      </div>
+    </div>
 
-        <a href="{{ url_for('loan_create') }}">Añadir prestamo</a>
-        <a href="{{ url_for('loan_list') }}">Mostrar prestamos</a>
-        <a href="{{ url_for('loan_delete') }}">Borrar prestamos</a>
+    <div class="dropdown">
+      <button onclick="dropDown(1)" class="dropdownbtn">Prestamos</button>
+      <div id="dropdown_loans" class="dropdown_objects">
+        <a href="{{ url_for('loan_create') }}">Añadir</a>
+        <a href="{{ url_for('loan_list') }}">Mostrar</a>
+        <a href="{{ url_for('loan_delete') }}">Borrar</a>
+     </div>
+    </div>
 
-        <a href="{{ url_for('penalty_list') }}">Mostrar sanciones</a>
+    <div class="dropdown">
+      <button onclick="dropDown(2)" class="dropdownbtn">Sanciones</button>
+      <div id="dropdown_penalties" class="dropdown_objects">
+        <a href="{{ url_for('penalty_list') }}">Mostrar</a>
+        <a href="{{ url_for('penalty_delete') }}">Borrar</a>
+     </div>
     </div>
 
     <br>

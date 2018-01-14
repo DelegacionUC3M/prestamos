@@ -27,3 +27,31 @@ function searchItem() {
   }
 }
 
+function dropDown(option) {
+    if (option == 0) {
+        // Muestra las opciones de los objetos
+        document.getElementById("dropdown_objects").classList.toggle("show");
+    } else if (option == 1){
+        // Muestra las opciones de los prestamos
+        document.getElementById("dropdown_loans").classList.toggle("show");
+    } else if (option == 2) {
+        // Muestra las opciones de las sanciones
+        document.getElementById("dropdown_penalties").classList.toggle("show");
+    }
+}
+
+// Si se pulsa fuera del boton se cierra el dropdown
+window.onclick = function(event) {
+    if (!event.target.matches('.dropdownbtn')) {
+
+        // Obtenemos el dropdown con mas opciones
+        var dropdowns = document.getElementsByClassName("dropdown_objects");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}

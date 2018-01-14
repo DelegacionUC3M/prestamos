@@ -12,12 +12,8 @@
 
     <form action="{{ request.path }}" method="POST">
         Préstamo:<br>
-            {% for loan in loans %}
               {% for item in items%}
-                {% if item.id == loan.item_id and item.amount > 0 %}
                   <input type="checkbox" id="loan_{{loan.id}}" name="prestamos" value="{{ loan.id }}">{{loan.user}} : {{item.name}}<br>
-                {% endif %}
-              {% endfor%}
             {% endfor %}
         <input type="submit" value="Submit">
     </form>

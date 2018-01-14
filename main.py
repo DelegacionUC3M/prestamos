@@ -17,8 +17,6 @@ db.init_app(app)
 db.create_all()
 
 # TODO
-# Crear una busqueda para eliminar objetos en vez del selector
-# Crear una busqueda para eliminar préstamos en vez del selector
 # Crear un buscador para añadir objetos a los prestamos
 # Actualizar el objeto tras editarlo
 
@@ -85,13 +83,15 @@ def loan_delete():
     if request.method == 'POST':
         # Obtiene el préstamo de la base de datos
         # cuyo id corresponde con el del formulatio
-        deleted_loan = loan.Loan.query.get(
-            int(request.form.get('comp_select')))
-        object = item.Item.query.get(deleted_loan.item_id)
-        # Devuelve los objetos prestados a la db
-        object.amount += deleted_loan.amount
-        # Elimina el prestamo de la db
-        db.session.delete(deleted_loan)
+        deleted_loans = request.form.getlist("prestamos")
+        for id_prestamo in deleted_loans:
+            prestamo = loan.Loan.query.get(id_prestamo)
+            # Objeto al que referencia el prestamo
+            object = item.Item.query.get(prestamo.item_id)
+            # Devuelve los objetos prestados a la db
+            object.amount += prestamo.amount
+            # Elimina el prestamo de la db
+            db.session.delete(prestamo)
         db.session.commit()
         return render_template("index.html",
                                items=item.Item.query.all(),
@@ -147,7 +147,7 @@ def item_delete():
         # Obtiene la lista de objetos seleccionados
         # Es una lista con los id de las checkboxes
         deleted_objects = request.form.getlist("objetos")
-        # Busca el objeto a borrar en la lista de préstamos
+        # Busca los objeto/s a borrar en la db
         for object in deleted_objects:
             # Elimina el objeto de la db PERMANENTEMENTE
             db_object = item.Item.query.get(int(object))
@@ -157,9 +157,8 @@ def item_delete():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
-        # Dummy variable
+        # Lista para guardar los id de los objetos prestados
         id_prestamos = []
-
         for prestamo in loan.Loan.query.all():
             id_prestamos.append(prestamo.item_id)
 
@@ -172,6 +171,22 @@ def item_delete():
 def penalty_list():
     return render_template('penalty_list.html',
                            penalties=penalty.Penalty.query.all())
+
+
+@app.route('/penalty/delete', methods=['GET', 'POST'])
+def penalty_delete():
+    if  request.method == 'POST':
+        sanciones = request.form.getlist('penalties')
+        for sancion in sanciones:
+            db_penalty = penalty.Penalty.query.get(sancion)
+            db.session.delete(db_penalty)
+        db.session.commit()
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
+    else:
+        return render_template('penalty_delete.html',
+                               penalties=penalty.Penalty.query.all())
 
 
 if __name__ == '__main__':

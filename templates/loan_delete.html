@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Borrar préstamo</title>
-    <script src="{{ url_for('static', filename='search.js') }}"></script>
 </head>
 
 <body>
-
-    <input type="text" id="Buscador" onkeyup="searchCheckbox()" placeholder="Buscar prestamos">
-
     <form action="{{ request.path }}" method="POST">
-        Préstamo:<br>
-              {% for item in items%}
-                  <input type="checkbox" id="loan_{{loan.id}}" name="prestamos" value="{{ loan.id }}">{{loan.user}} : {{item.name}}<br>
-            {% endfor %}
+       <br>
+       Préstamo:
+       <br>
+
+      {% for loan in loans %}
+        {% for item in items %}
+          {% if item.id == loan.item_id %}
+          <input type="checkbox" id="loan_{{ loan.id }}" name="prestamos" value="{{ loan.id }}">
+          {{ loan.user }} :
+          {{ loan.amount }}
+          {{ item.name }}
+          {{ loan.loan_date }}<br>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
         <input type="submit" value="Submit">
     </form>
 

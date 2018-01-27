@@ -1,5 +1,6 @@
 from .connection import db
 
+
 class Loan(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
@@ -16,6 +17,9 @@ class Loan(db.Model):
         self.refund_date = refund_date
 
     def __repr__(self):
-        return str({'id': self.id, 'item_id': self.item_id, 'user': self.user,
-                    'amount': self.amount, 'loan_date': self.loan_date,
+        return str({'id': self.id,
+                    'item_id': self.item_id,
+                    'user': self.user,
+                    'amount': self.amount,
+                    'loan_date': self.loan_date,
                     'refund_date': self.refund_date})

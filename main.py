@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from models import item, loan, penalty
 from models.connection import db
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Inicializacion del objeto Flask
 app = Flask(__name__)
@@ -17,8 +17,8 @@ db.init_app(app)
 db.create_all()
 
 # TODO
-# Crear un buscador para añadir objetos a los prestamos
 # Actualizar el objeto tras editarlo
+
 
 @app.route('/', methods=['GET', 'POST'])
 
@@ -37,38 +37,49 @@ def index():
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
     if request.method == 'POST':
-        # Objeto/s que se ha prestado
-        object = item.Item.query.get(int(request.form.get('comp_select')))
-        # Se deben prestar menos objetos de los existentes
-        if object.amount >= int(request.form['amount']):
-            # Fecha en la que el objeto se ha prestado
-            loan_date = datetime.strptime(request.form['loan_date'],
-                                          "%Y-%m-%d")
-            # Fecha en la que hay que devolver el objeto
-            refund_date = loan_date + timedelta(days=object.loan_days)
-            loan_data = loan.Loan(request.form.get('comp_select'),
-                                  int(request.form['user']),
-                                  int(request.form['amount']),
-                                  request.form['loan_date'],
-                                  refund_date)
-
-            object.amount -= loan_data.amount
-            db.session.add(loan_data)
-            db.session.commit()
-            return render_template("index.html",
-                                   items=item.Item.query.all(),
-                                   loans=loan.Loan.query.all())
-        # Se han prestamo más objetos de los existentes
-        else:
-            error = 'No hay tantos objetos para prestar'
+        # Usuario que ha hecho el prestamos para comprobar
+        # si se le puede prestar el objeto
+        usuario = request.form['user']
+        object = item.Item.query.get(request.form.getlist("objeto"))
+        # Prestamos realizados por ese usuario y ese objeto
+        done_loans = loan.Loan.query.filter_by(user=usuario,
+                                               item_id=object.id)
+        # Si se le han prestado 2 o más objetos no se puede
+        # hacer el préstamo
+        if done_loans.count() >= 2:
+            error = 'El usuario ha alcanzado el máximo de prestamos'
             return render_template("index.html",
                                    items=item.Item.query.all(),
                                    loans=loan.Loan.query.all(),
                                    error=error)
+        # Si aun no ha alcanzado el máximo de prestamos
+        else:
+            # Se deben prestar menos objetos de los existentes
+            if object.amount >= int(request.form['amount']):
+                # Fecha en la que hay que devolver el objeto
+                loan_data = loan.Loan(object.id,
+                                      int(usuario),
+                                      int(request.form['amount']),
+                                      request.form['loan_date'],
+                                      None)
+
+                object.amount -= loan_data.amount
+                db.session.add(loan_data)
+                db.session.commit()
+                return render_template("index.html",
+                                       items=item.Item.query.all(),
+                                       loans=loan.Loan.query.all())
+            # Se han prestamo más objetos de los existentes
+            else:
+                error = 'No hay tantos objetos para prestar'
+                return render_template("index.html",
+                                       items=item.Item.query.all(),
+                                       loans=loan.Loan.query.all(),
+                                       error=error)
     else:
+        free_items = item.Item.query.filter(item.Item.amount > 0)
         return render_template("loan_create.html",
-                               items=item.Item.query.all(),
-                               loans=loan.Loan.query.all())
+                               items=free_items)
 
 
 @app.route('/loan/list', methods=['GET'])
@@ -81,25 +92,27 @@ def loan_list():
 @app.route('/loan/delete', methods=['GET', 'POST'])
 def loan_delete():
     if request.method == 'POST':
-        # Obtiene el préstamo de la base de datos
-        # cuyo id corresponde con el del formulatio
+        current_date = datetime.date(datetime.now())  # Fecha actual
+        # Ids de los prestamos que se han seleccionado para borrar
         deleted_loans = request.form.getlist("prestamos")
-        for id_prestamo in deleted_loans:
-            prestamo = loan.Loan.query.get(id_prestamo)
-            # Objeto al que referencia el prestamo
-            object = item.Item.query.get(prestamo.item_id)
-            # Devuelve los objetos prestados a la db
-            object.amount += prestamo.amount
-            # Elimina el prestamo de la db
-            db.session.delete(prestamo)
-        db.session.commit()
+        for prestamo in deleted_loans:
+            db_prestamo = loan.Loan.query.get(int(prestamo))
+            objeto = item.Item.query.get(db_prestamo.item_id)
+            # Devuelve los objetos prestados a la db y
+            objeto.amount += db_prestamo.amount
+            # Marca el objeto como devuelto
+            db_prestamo.refund_date = current_date
+            db.session.commit()
         return render_template("index.html",
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
+        # Devuelve las dos listas en vez de una como debería ser
+        # porque jinja no devuelve bien los valores al estar las dos
+        # listas en un zip
         return render_template('loan_delete.html',
                                items=item.Item.query.all(),
-                               loans=loan.Loan.query.all())
+                               loans=loan.Loan.query.filter_by(refund_date=None))
 
 
 
@@ -132,6 +145,7 @@ def item_list():
 @app.route('/object/edit', methods=['GET', 'POST'])
 def item_edit():
     if request.method == 'POST':
+        # for object in request.form.getlist("objetos"):
         return render_template('index.html',
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
@@ -159,23 +173,29 @@ def item_delete():
     else:
         # Lista para guardar los id de los objetos prestados
         id_prestamos = []
+        free_items = []
         for prestamo in loan.Loan.query.all():
             id_prestamos.append(prestamo.item_id)
 
         # Si el objeto no está prestado se mostrará
-        free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
+        for objeto in item.Item.query.all():
+            if objeto.id not in id_prestamos:
+                free_items.append(objeto)
+
+        # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
         return render_template('item_delete.html', items=free_items)
 
 
 @app.route('/penalty/list', methods=['GET'])
 def penalty_list():
+    # Obtiene los prestamos de las sanciones
     return render_template('penalty_list.html',
                            penalties=penalty.Penalty.query.all())
 
 
 @app.route('/penalty/delete', methods=['GET', 'POST'])
 def penalty_delete():
-    if  request.method == 'POST':
+    if request.method == 'POST':
         sanciones = request.form.getlist('penalties')
         for sancion in sanciones:
             db_penalty = penalty.Penalty.query.get(sancion)

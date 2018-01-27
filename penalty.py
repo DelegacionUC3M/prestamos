@@ -1,10 +1,9 @@
 from models import item, loan, penalty
 from main import db
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 current_day = datetime.date(datetime.now())  # Fecha actual
 prestamos = loan.Loan.query.all()  # Lista de prestamos
-current_penalties = penalty.Penalty.query.all()  # Lista actual de sanciones
 
 for prestamo in prestamos:
     sancion = penalty.Penalty.query.filter_by(loan_id=prestamo.id)
@@ -24,12 +23,16 @@ for prestamo in prestamos:
                                   penalty_date)
         db.session.add(sancion)
         db.session.commit()
+
     # Si la sanción ya existe, se recalcula la fecha
-    elif sancion is not None:
+    elif (prestamo.refund_date < current_day and sancion is not None):
+        # Objeto que se ha prestado para el coeficiente
+        object = item.Item.query.get(prestamo.item_id)
         # Recalculo para la fecha de penalización
-        penalty_date = current_day
+        new_date = current_day
         + timedelta(days=abs(current_day.day - prestamo.refund_date.day)
                     * object.penalty_coefficient)
+
         # Actualiza la fecha de penalización
-        sancion.penalty_date = penalty_date
+        sancion.penalty_date = new_date
         db.session.commit()

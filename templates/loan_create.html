@@ -3,29 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Crear préstamo</title>
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
 </head>
 
 <body>
     <form action="{{ request.path }}" method="POST">
-        Usuario:
-        <input type="number" name="user" placeholder="NIA">
+      Usuario:
+      <input type="number" min="0" max="100999999" name="user" required="true" placeholder="NIA">
 
-        Objeto:
-        <select name="comp_select">
-            {% for item in items %}
-              {% for loan in loans %}
-                {% if item.id != loan.item_id and item.amount > 0 %}
-                  <option value="{{ item.id }}">{{ item.name }} {{ item.state }}</option>
-                {% endif %}
-              {% endfor %}
-            {% endfor %}
-        </select>
+      Cantidad:
+      <input type="number" min="0" name="amount" required="true" placeholder="Cantidad">
 
-        Cantidad:
-        <input type="number" min="0" name="amount" placeholder="Cantidad">
+      Fecha préstamo:
+      <input type="date" name="loan_date" required="true" placeholder="Fecha préstamo">
+      <br>
+      <br>
+      <br>
 
-        Fecha préstamo:
-        <input type="date" name="loan_date" placeholder="Fecha préstamo">
+      Objeto:
+      <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objeto">
+
+      <select id="Opciones">
+        <option value="1">Objeto</option>
+        <option value="2">Cantidad</option>
+        <option value="3">Estado</option>
+        <option value="4">Tipo</option>
+        <option value="5">Dias</option>
+        <option value="6">Coeficiente</option>
+      </select>
+
+      <table id="Tabla">
+        <tr>
+          <th>Seleccion</th>
+          <th>Objeto</th>
+          <th>Cantidad</th>
+          <th>Estado</th>
+          <th>Tipo</th>
+          <th>Duración préstamo</th>
+          <th>% penalizacion</th>
+        </tr>
+      {% for item in items %}
+      <tr>
+          <td><input type="radio" required="true" value="{{ item.id }}" name="objeto"></td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.amount }}</td>
+          <td>{{ item.state }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.loan_days }}</td>
+          <td>{{ item.penalty_coefficient }}</td>
+      </tr>
+    {% endfor %}
+    </table>
 
         <input type="submit" value="Submit">
     </form>

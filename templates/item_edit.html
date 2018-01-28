@@ -10,9 +10,19 @@
 <body>
     <a href="{{ url_for('index') }}">Página principal</a>
 
-  <form action="{{ request.path }}" method="POST">
 
-    <table>
+    <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objetos">
+    <select id="Opciones">
+      <option value="1">Nombre</option>
+      <option value="2">Cantidad</option>
+      <option value="3">Estado</option>
+      <option value="4">Tipo</option>
+      <option value="5">Dias</option>
+      <option value="6">Coeficiente</option>
+    </select>
+
+  <form action="{{ request.path }}" method="POST">
+    <table id="Tabla">
       <tr>
           <th>Objeto</th>
           <th>Cantidad</th>
@@ -22,15 +32,31 @@
           <th>% penalizacion</th>
       </tr>
     {% for item in items %}
-      <input type="checkbox" name="objetos" id ="item_{{ item.id }}" value="{{ item.id }}">
-      {{ item.name }}
-      <input type="number" min="0" name="amount" value="{{ item.amount }}">
-      {{ item.state }}
-      {{ item.type }}
-      <input type="number" min="0" name="loan_days" value="{{ item.loan_days }}">
-      <input type="number" min="0" name="penalty_coefficient" value="{{ item.penalty_coefficient }}"><br>
+      <tr>
+      <td><input type="radio" name="objetos" id ="item_{{ item.id }}" value="{{ item.id }}"></td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.amount }}</td>
+      <td>{{ item.state }}</td>
+      <td>{{ item.type }}</td>
+      <td>{{ item.loan_days }}</td>
+      <td>{{ item.penalty_coefficient }}</td>
+    </tr>
     {% endfor %}
     </table>
+
+    <br>
+    Nombre:
+    <input type="text" name="name" placeholder="Nombre">
+    Cantidad:
+    <input type="number" min="0" name="amount" placeholder="Cantidad">
+    Tipo:
+    <input type="text" name="type" placeholder="Tipo de objeto">
+    Estado:
+    <input type="text" name="state" placeholder="Defectuoso, funciona...">
+    Dias préstamo:
+    <input type="number" min="0" name="loan_days" placeholder="Duración max préstamo">
+    Ratio penalización:
+    <input type="number" min="0" step="1" name="penalty_coefficient" placeholder="Ratio penalización">
 
     <input type="submit" value="Submit">
   </form>

@@ -148,12 +148,22 @@ def item_list():
 @app.route('/object/edit', methods=['GET', 'POST'])
 def item_edit():
     if request.method == 'POST':
-        for object in request.form.getlist("objetos"):
-            db_object = item.Item.query.get(int(object))
-            db_object.amount = request.form['amount']
-            db_object.loan_days = request.form['loan_days']
-            db_object.penalty_coefficient = request.form['penalty_coefficient']
-            db.session.commit()
+        db_object = item.Item.query.get(request.form.getlist("objetos"))
+        nombre = request.form['name']
+        cantidad = request.form['amount']
+        tipo = request.form['type']
+        estado = request.form['state']
+        dias = request.form['loan_days']
+        coeficiente = request.form['penalty_coefficient']
+
+        db_object.name = str(nombre) if nombre else db_object.name
+        db_object.amount = int(cantidad) if cantidad else db_object.amount
+        db_object.type = str(tipo) if tipo else db_object.type
+        db_object.state = str(estado) if estado else db_object.state
+        db_object.loan_days = int(dias) if dias else db_object.loan_days
+        db_object.penalty_coefficient = float(coeficiente) if coeficiente else db_object.penalty_coefficient
+
+        db.session.commit()
         return render_template('index.html',
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
@@ -187,7 +197,7 @@ def item_delete():
 
         # Si el objeto no está prestado se mostrará
         # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
-        for objeto in item.Item.query.all():
+        for objeto in item.Item.query.filter(item.Item.amount > 0):
             if objeto.id not in id_prestamos:
                 free_items.append(objeto)
         return render_template('item_delete.html', items=free_items)

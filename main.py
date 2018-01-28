@@ -23,9 +23,6 @@ db.create_all()
 @app.route('/', methods=['GET', 'POST'])
 
 
-@app.route('/login', methods=['GET', 'POST'])
-
-
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
@@ -44,9 +41,17 @@ def loan_create():
         # Prestamos realizados por ese usuario y ese objeto
         done_loans = loan.Loan.query.filter_by(user=usuario,
                                                item_id=object.id)
+        sancion = penalty.Penalty.query.filter_by(user=int(usuario))
+        # El usuario está sancionado
+        if sancion.count() >= 1:
+            error = 'El usuario está sancionado'
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all(),
+                                   error=error)
         # Si se le han prestado 2 o más objetos no se puede
         # hacer el préstamo
-        if done_loans.count() >= 2:
+        elif done_loans.count() >= 2:
             error = 'El usuario ha alcanzado el máximo de prestamos'
             return render_template("index.html",
                                    items=item.Item.query.all(),
@@ -62,7 +67,6 @@ def loan_create():
                                       int(request.form['amount']),
                                       request.form['loan_date'],
                                       None)
-
                 object.amount -= loan_data.amount
                 db.session.add(loan_data)
                 db.session.commit()
@@ -125,7 +129,6 @@ def item_create():
                               str(request.form['state'].lower()),
                               int(request.form['loan_days']),
                               float(request.form['penalty_coefficient']))
-
         # Añade el objeto a la db
         db.session.add(loan_item)
         db.session.commit()
@@ -145,7 +148,12 @@ def item_list():
 @app.route('/object/edit', methods=['GET', 'POST'])
 def item_edit():
     if request.method == 'POST':
-        # for object in request.form.getlist("objetos"):
+        for object in request.form.getlist("objetos"):
+            db_object = item.Item.query.get(int(object))
+            db_object.amount = request.form['amount']
+            db_object.loan_days = request.form['loan_days']
+            db_object.penalty_coefficient = request.form['penalty_coefficient']
+            db.session.commit()
         return render_template('index.html',
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
@@ -171,18 +179,17 @@ def item_delete():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
-        # Lista para guardar los id de los objetos prestados
+        # Lista para guardar los id de los objetos prestados no devueltos
         id_prestamos = []
         free_items = []
-        for prestamo in loan.Loan.query.all():
+        for prestamo in loan.Loan.query.filter_by(refund_date=None):
             id_prestamos.append(prestamo.item_id)
 
         # Si el objeto no está prestado se mostrará
+        # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
         for objeto in item.Item.query.all():
             if objeto.id not in id_prestamos:
                 free_items.append(objeto)
-
-        # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
         return render_template('item_delete.html', items=free_items)
 
 
@@ -196,10 +203,12 @@ def penalty_list():
 @app.route('/penalty/delete', methods=['GET', 'POST'])
 def penalty_delete():
     if request.method == 'POST':
+        current_date = datetime.date(datetime.now())  # Fecha actual
         sanciones = request.form.getlist('penalties')
         for sancion in sanciones:
             db_penalty = penalty.Penalty.query.get(sancion)
-            db.session.delete(db_penalty)
+            # Marca la sanción como terminada
+            db_penalty.penalty_date = current_date
         db.session.commit()
         return render_template("index.html",
                                items=item.Item.query.all(),

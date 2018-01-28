@@ -10,16 +10,7 @@
 <body>
     <a href="{{ url_for('index') }}">Página principal</a>
 
-    <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objeto">
-
-    <select id="Opciones">
-      <option value="0">Objeto</option>
-      <option value="1">Cantidad</option>
-      <option value="2">Estado</option>
-      <option value="3">Tipo</option>
-      <option value="4">Duración</option>
-      <option value="5">Coeficiente</option>
-    </select>
+  <form action="{{ request.path }}" method="POST">
 
     <table>
       <tr>
@@ -30,16 +21,18 @@
           <th>Duración préstamo</th>
           <th>% penalizacion</th>
       </tr>
-    </table>
     {% for item in items %}
-          [{{ item.id }}]
-          <input type="text" name="name" value="{{ item.name }}">
-          <input type="number" min="0" name="amount" value="{{ item.amount }}">
-          <input type="text" name="amount" value="{{ item.state }}">
-          <input type="text" name="type" value="{{ item.type }}">
-          <input type="number" min="0" name="loan_days" value="{{ item.loan_days }}">
-          <input type="number" min="0" name="penalty_coefficient" value="{{ item.penalty_coefficient }}"><br>
+      <input type="checkbox" name="objetos" id ="item_{{ item.id }}" value="{{ item.id }}">
+      {{ item.name }}
+      <input type="number" min="0" name="amount" value="{{ item.amount }}">
+      {{ item.state }}
+      {{ item.type }}
+      <input type="number" min="0" name="loan_days" value="{{ item.loan_days }}">
+      <input type="number" min="0" name="penalty_coefficient" value="{{ item.penalty_coefficient }}"><br>
     {% endfor %}
+    </table>
 
+    <input type="submit" value="Submit">
+  </form>
 </body>
 </html>

@@ -6,6 +6,7 @@
 </head>
 
 <body>
+  <a href="{{ url_for('index') }}">Página principal</a><br>
   <form action="{{ request.path }}" method="POST">
       Objeto:<br>
           {% for item in items %}

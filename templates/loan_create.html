@@ -7,6 +7,7 @@
 </head>
 
 <body>
+    <a href="{{ url_for('index') }}">Página principal</a><br>
     <form action="{{ request.path }}" method="POST">
       Usuario:
       <input type="number" min="0" max="100999999" name="user" required="true" placeholder="NIA">

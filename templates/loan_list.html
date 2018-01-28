@@ -17,6 +17,7 @@
       <option value="1">Objeto</option>
       <option value="2">Cantidad</option>
       <option value="3">Fecha</option>
+      <option value="4">Devolución</option>
     </select>
 
     <table id="Tabla">
@@ -25,6 +26,7 @@
           <th>Objeto prestado</th>
           <th>Cantidad</th>
           <th>Fecha del préstamo</th>
+          <th>Fecha de devolución</th>
       </tr>
     {% for loan in loans %}
       {% for item in items %}
@@ -34,6 +36,7 @@
           <td>{{ item.name }}</td>
           <td>{{ loan.amount }}</td>
           <td>{{ loan.loan_date }}</td>
+          <td>{{ loan.refund_date }}</td>
       </tr>
         {% endif %}
       {% endfor %}

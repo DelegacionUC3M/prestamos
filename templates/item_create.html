@@ -6,6 +6,7 @@
 </head>
 
 <body>
+    <a href="{{ url_for('index') }}">Página principal</a><br>
     <form action="{{ request.path }}" method="POST">
         Nombre:
         <input type="text" name="name" required="true" placeholder="Nombre">
@@ -23,7 +24,7 @@
         <input type="number" min="0" name="loan_days" required="true" placeholder="Duración max préstamo">
 
         Ratio penalización:
-        <input type="number" min="0" max="1" step="0.01" name="penalty_coefficient" required="true" placeholder="Ratio penalización">
+        <input type="number" min="0" step="1" name="penalty_coefficient" required="true" placeholder="Ratio penalización">
 
         <input type="submit" value="Submit">
     </form>

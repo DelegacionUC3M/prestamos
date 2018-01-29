@@ -230,8 +230,9 @@ def penalty_delete():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
+        current_date = datetime.date(datetime.now())  # Fecha actual
         return render_template('penalty_delete.html',
-                               penalties=penalty.Penalty.query.filter_by(penalty_date=None))
+                               penalties=penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date))
 
 
 if __name__ == '__main__':

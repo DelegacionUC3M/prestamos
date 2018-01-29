@@ -41,7 +41,8 @@ def loan_create():
         # Prestamos realizados por ese usuario y ese objeto
         done_loans = loan.Loan.query.filter_by(user=usuario,
                                                item_id=object.id)
-        sancion = penalty.Penalty.query.filter_by(user=int(usuario))
+        sancion = penalty.Penalty.query.filter_by(user=int(usuario),
+                                                  penalty_date=None)
         # El usuario está sancionado
         if sancion.count() >= 1:
             error = 'El usuario está sancionado'
@@ -112,6 +113,11 @@ def loan_delete():
                                loans=loan.Loan.query.all())
     else:
         # Devuelve las dos listas en vez de una como debería ser
+
+
+
+
+
         # porque jinja no devuelve bien los valores al estar las dos
         # listas en un zip
         return render_template('loan_delete.html',
@@ -225,7 +231,7 @@ def penalty_delete():
                                loans=loan.Loan.query.all())
     else:
         return render_template('penalty_delete.html',
-                               penalties=penalty.Penalty.query.all())
+                               penalties=penalty.Penalty.query.filter_by(penalty_date=None))
 
 
 if __name__ == '__main__':

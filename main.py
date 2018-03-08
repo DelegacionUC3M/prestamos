@@ -38,10 +38,15 @@ def loan_create():
         # Objeto que ha sido prestado
         db_objeto = item.Item.query.get(request.form.getlist("objeto"))
 
-        # TODO Los objetos electricos se pueden prestar 2 veces independientemente de la cantidad
-        # Prestamos realizados por ese usuario y ese objeto
-        done_loans = loan.Loan.query.filter_by(user=usuario,
-                                               item_id=db_objeto.id)
+        # Prestamos realizados por ese usuario
+        prestamos_especiales = prestamos_normales = 0
+        for prestamo in loan.Loan.query.filter_by(user=usuario):
+            objeto = item.Item.query.get(prestamo.item_id)
+            # Filtra los objetos dependiendo de si se pueden prestar varias veces o solo una
+            if objeto.type in two_time_objects:
+                prestamos_especiales += 1
+            elif objeto.name == db_objeto.name:
+                prestamos_normales += prestamo.amount
 
         # Sancion del usuario si existe
         sancion = penalty.Penalty.query.filter_by(user=int(usuario),
@@ -58,8 +63,8 @@ def loan_create():
 
         # Si se le ha prestado dos veces el mismo objeto o ha pedido dos prestamos
         # de los prestamos unicos
-        if (db_objeto.type not in two_time_objects and sum(c.amount for c in done_loans) >= 2
-                or db_objeto.type in two_time_objects and done_loans.count() >= 2):
+        if (db_objeto.type not in two_time_objects and prestamos_normales >= 2
+                or db_objeto.type in two_time_objects and prestamos_especiales >= 2):
             error = 'Máximo número de prestamos alcanzados'
             return render_template("index.html",
                                    items=item.Item.query.all(),

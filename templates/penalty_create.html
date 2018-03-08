@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear sanción</title>
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
+</head>
+
+<body>
+    <a href="{{ url_for('index') }}">Página principal</a><br>
+    <form action="{{ request.path }}" method="POST">
+      Usuario:
+      <input type="number" min="0" max="100999999" name="user" required="true" placeholder="NIA">
+
+      Fecha sanción:
+      <input type="date" name="loan_date" required="true" placeholder="Fecha préstamo">
+      <br>
+
+       <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

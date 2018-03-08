@@ -42,6 +42,7 @@
     <div class="dropdown">
       <button onclick="dropDown(2)" class="dropdownbtn">Sanciones</button>
       <div id="dropdown_penalties" class="dropdown_objects">
+        <a href="{{ url_for('penalty_create') }}">Añadir</a>
         <a href="{{ url_for('penalty_list') }}">Mostrar</a>
         <a href="{{ url_for('penalty_delete') }}">Borrar</a>
      </div>

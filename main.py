@@ -42,6 +42,7 @@ def loan_create():
         # Prestamos realizados por ese usuario y ese objeto
         done_loans = loan.Loan.query.filter_by(user=usuario,
                                                item_id=db_objeto.id)
+
         # Sancion del usuario si existe
         sancion = penalty.Penalty.query.filter_by(user=int(usuario),
                                                   penalty_date=None)
@@ -57,7 +58,7 @@ def loan_create():
 
         # Si se le ha prestado dos veces el mismo objeto o ha pedido dos prestamos
         # de los prestamos unicos
-        if (db_objeto.type not in two_time_objects and done_loans.amount() >= 2
+        if (db_objeto.type not in two_time_objects and sum(c.amount for c in done_loans) >= 2
                 or db_objeto.type in two_time_objects and done_loans.count() >= 2):
             error = 'Máximo número de prestamos alcanzados'
             return render_template("index.html",
@@ -66,7 +67,7 @@ def loan_create():
                                    error=error)
 
         # Se han prestamo más objetos de los existentes
-        if db_objeto.amount <= int(cantidad):
+        if cantidad > db_objeto.amount:
             error = 'No hay tantos objetos para prestar'
             return render_template("index.html",
                                    items=item.Item.query.all(),
@@ -216,15 +217,9 @@ def penalty_create():
     if request.method == 'POST':
         usuario = request.form['user']
         prestamo = loan.Loan.query.filter_by(user=usuario)
-        sancion = penalty.Penalty.query.get(user=usuario)
-        if sancion.count() > 0:
-            error = "El usuario ya se encuentra sancionado"
-            return render_template("index.html",
-                                   items=item.Item.query.all(),
-                                   loans=loan.Loan.query.all(),
-                                   error=error)
-
-        elif prestamo.count() == sancion.count() == 0:
+        sancion = penalty.Penalty.query.filter_by(user=usuario)
+        # El usuario no esta en la base de datos
+        if prestamo.count() == 0:
             error = "El usuario no se encuentra en la base de datos"
             return render_template("index.html",
                                    items=item.Item.query.all(),
@@ -232,17 +227,26 @@ def penalty_create():
                                    error=error)
         else:
             fecha_sancion = datetime.date(datetime.now())  # Fecha actual
-            # El usuario no puede coger ningún objeto más en el cuatrimestre
-            fecha_final = fecha_sancion + timedelta(days=(30 * 5))
-            sancion = penalty.Penalty(usuario,
-                                      prestamo[0].id,
-                                      fecha_sancion,
-                                      fecha_final)
-            db.session.add(sancion)
-            db.session.commit()
+            fecha_final = fecha_sancion + timedelta(days=(150))
+            # Si el usuario existe, actualizar la fecha final
+            if sancion.count() > 0:
+                sancion[0].sanction_date = fecha_sancion
+                sancion[0].penalty_date = fecha_final
+                db.session.commit()
+
+            # Se crea una sancion para el usuario
+            else:
+                # El usuario no puede coger ningún objeto más en el cuatrimestre
+                sancion = penalty.Penalty(usuario,
+                                          prestamo[0].id,
+                                          fecha_sancion,
+                                          fecha_final)
+                db.session.add(sancion)
+                db.session.commit()
             return render_template("index.html",
                                    items=item.Item.query.all(),
                                    loans=loan.Loan.query.all())
+    # GET request
     else:
         return render_template('penalty_create.html')
 

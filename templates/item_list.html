@@ -1,47 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Listar objetos</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
-    <script src="{{ url_for('static', filename='search.js') }}"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
+  <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
+  <script src="{{ url_for('static', filename='search.js') }}"></script>
+
+  <title>Objetos</title>
 </head>
 
 <body>
-    <a href="{{ url_for('index') }}">Página principal</a><br>
 
-    <!-- Barra para buscar objetos en la tabla -->
-    <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objetos">
+<nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+  <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <!-- Dropdown de objetos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Objetos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+          <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+        </div>
+      </li>
+      <!-- Dropdown de prestamos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Prestamos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Borrar</a>
+        </div>
+      </li>
+      <!-- Dropdown de prestamos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sanciones
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
 
-    <select id="Opciones">
-      <option value="0">Nombre</option>
-      <option value="1">Cantidad</option>
-      <option value="2">Estado</option>
-      <option value="3">Tipo</option>
-      <option value="4">Dias</option>
-      <option value="5">Coeficiente</option>
-    </select>
+<div id="container">
+  <div id="buscador">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <label class="input-group-text" for="inputGroupSelect01">Criterio</label>
+        <select class="custom-select" id="Opciones">
+          <option value="0">Nombre</option>
+          <option value="1">Cantidad</option>
+          <option value="2">Estado</option>
+          <option value="3">Tipo</option>
+          <option value="4">Dias</option>
+          <option value="5">Coeficiente</option>
+        </select>
+        <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objetos" class="form-control" aria-label="Text input with dropdown button">
+      </div>
+    </div>
+  </div>
 
-    <table id="Tabla">
-      <tr>
-          <th>Objeto</th>
-          <th>Cantidad</th>
-          <th>Estado</th>
-          <th>Tipo</th>
-          <th>Duración préstamo</th>
-          <th>% penalizacion</th>
-      </tr>
-    {% for item in items %}
-      <tr>
-          <td>{{ item.name }}</td>
-          <td>{{ item.amount }}</td>
-          <td>{{ item.state }}</td>
-          <td>{{ item.type }}</td>
-          <td>{{ item.loan_days }}</td>
-          <td>{{ item.penalty_coefficient }}</td>
-      </tr>
-    {% endfor %}
-    </table>
-
+  <div id="lista">
+    <ul id="objetos" class="list-group">
+      {% for item in items %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a>{{ item.name }} - {{ item.state }} - {{ item.type }} - {{ item.loan_days }} - {{ item.penalty_coefficient }}</a>
+        <span class="badge badge-info">{{ item.amount }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+          Objeto
+          Cantidad
+          Estado
+          Tipo
+          Duración préstamo
+          % penalizacion
+  </div>
+</div>
 </body>
 </html>

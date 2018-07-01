@@ -1,32 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Crear objeto</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
+  <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
+  <script src="{{ url_for('static', filename='search.js') }}"></script>
+
+  <meta charset="UTF-8">
+  <title>Crear objeto</title>
 </head>
 
 <body>
-    <a href="{{ url_for('index') }}">Página principal</a><br>
+
+<nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+  <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <!-- Dropdown de objetos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Objetos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+          <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+        </div>
+      </li>
+      <!-- Dropdown de prestamos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Prestamos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+        </div>
+      </li>
+      <!-- Dropdown de prestamos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sanciones
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
     <form action="{{ request.path }}" method="POST">
-        Nombre:
-        <input type="text" name="name" required="true" placeholder="Nombre">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Nombre</span>
+        </div>
+  <input type="text" class="form-control" placeholder="Nombre del objeto" aria-label="Nombre" aria-describedby="basic-addon1" name="name" required="true">
+    </div>
 
-        Cantidad:
-        <input type="number" min="0" name="amount" required="true" placeholder="Cantidad">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Cantida</span>
+      </div>
+      <input type="number" class="form-control" placeholder="Cantidad inicial" aria-label="Cantidad" aria-describedby="basic-addon1" name="amount" required="true" min="0">
+    </div>
 
-        Tipo:
-        <input type="text" name="type" required="true" placeholder="Tipo de objeto">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Tipo</span>
+      </div>
+      <input type="text" class="form-control" placeholder="Electrónico, papeleria..." aria-label="Cantidad" aria-describedby="basic-addon1" name="type" required="true">
+    </div>
 
-        Estado:
-        <input type="text" name="state" required="true" placeholder="Defectuoso, funciona...">
+<div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Estado</span>
+      </div>
+      <input type="text" class="form-control" placeholder="Defectuoso, funciona..." aria-label="Cantidad" aria-describedby="basic-addon1" name="state" required="true">
+    </div>
 
-        Dias préstamo:
-        <input type="number" min="0" name="loan_days" required="true" placeholder="Duración max préstamo">
+<div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Días</span>
+      </div>
+      <input type="number" class="form-control" placeholder="Duración del prestamo" aria-label="Cantidad" aria-describedby="basic-addon1" name="loan_days" required="true" min="0">
+    </div>
 
-        Ratio penalización:
-        <input type="number" min="0" step="1" name="penalty_coefficient" required="true" placeholder="Ratio penalización">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Penalización</span>
+      </div>
+      <input type="number" class="form-control" placeholder="Ratio de penalización" aria-label="Cantidad" aria-describedby="basic-addon1" name="penalty_coefficient" required="true" min="0" step="1">
+    </div>
 
-        <input type="submit" value="Submit">
+    <input type="submit" value="Enviar">
     </form>
 
 </body>

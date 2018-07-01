@@ -1,38 +1,54 @@
-.dropdownbtn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 16px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
+body {
+    background-color: rgba(79, 129, 189, 0.6 );
 }
 
-.dropdownbtn:hover, .dropdownbtn:focus {
-    background-color: #3e8e41;
+.navbar {
+    background-color: #FFFFFF;
 }
 
-.dropdown {
+ul {
+    padding-right: 0;
+    float:center;
+}
+
+li {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+span.badge-info{
     position: relative;
-    display: inline-block;
+    right:1vw;
+    width: 7vw;
+    background-color: rgb(69, 189, 156);
 }
 
-.dropdown_objects {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    overflow: auto;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+span.badge-secundary{
+    width: 10vw;
 }
 
-.dropdown_objects a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
+a.navbar-brand {
+    background-color: rgba(255, 192, 93, 0.6);
+    border-radius: 3px;
+    margin: 10px;
+    padding: 10px;
 }
 
-.dropdown a:hover {background-color: #f1f1f1}
+div#container {
+    padding-top: 20px;
+}
 
-.show {display:block;}
+div#left {
+    padding-left: 0.6vw;
+    padding-right: 0.6vw;
+}
+
+div#right {
+    padding-right: 0.6vw;
+    padding-left: 0.6vw;
+}
+
+div.input-group {
+    padding-top: 20px;
+}

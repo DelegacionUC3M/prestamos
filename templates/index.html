@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Pagina principal</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
-    <script src="{{ url_for('static', filename='search.js') }}"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+  <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
+  <script src="{{ url_for('static', filename='search.js') }}"></script>
+
+  <title>Inicio</title>
 </head>
 
 <body>
@@ -20,51 +32,77 @@
       <p><strong>Error:</strong> {{ error }}
     {% endif %}
 
-    <div class="dropdown">
-      <button onclick="dropDown(0)" class="dropdownbtn">Objetos</button>
-      <div id="dropdown_objects" class="dropdown_objects">
-        <a href="{{ url_for('item_create') }}">Añadir</a>
-        <a href="{{ url_for('item_list') }}">Mostrar</a>
-        <a href="{{ url_for('item_delete') }}">Borrar</a>
-        <a href="{{ url_for('item_edit') }}">Editar</a>
-      </div>
-    </div>
+<nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+  <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <!-- Dropdown de objetos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Objetos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+          <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+        </div>
+      </li>
+      <!-- Dropdown de prestamos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Prestamos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+        </div>
+      </li>
+      <!-- Dropdown de prestamos -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sanciones
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+          <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
 
-    <div class="dropdown">
-      <button onclick="dropDown(1)" class="dropdownbtn">Prestamos</button>
-      <div id="dropdown_loans" class="dropdown_objects">
-        <a href="{{ url_for('loan_create') }}">Añadir</a>
-        <a href="{{ url_for('loan_list') }}">Mostrar</a>
-        <a href="{{ url_for('loan_delete') }}">Borrar</a>
-     </div>
-    </div>
-
-    <div class="dropdown">
-      <button onclick="dropDown(2)" class="dropdownbtn">Sanciones</button>
-      <div id="dropdown_penalties" class="dropdown_objects">
-        <a href="{{ url_for('penalty_create') }}">Añadir</a>
-        <a href="{{ url_for('penalty_list') }}">Mostrar</a>
-        <a href="{{ url_for('penalty_delete') }}">Borrar</a>
-     </div>
-    </div>
-
-    <br>
-    <br>
-
+<div id="container" style="width:100%;">                                   
+  <div id="left" style="float:left; width:50%;">
+    <ul class="list-group">
     {% for item in items %}
-        <li>{{ item.name }} - {{ item.amount }} - {{ item.state }}</li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">{{ item.name }}
+      <span class="badge badge-secundary ">{{ item.state }}</span>
+      <span class="badge badge-info ">{{ item.amount }}</span>
+    </li>
     {% endfor %}
-
-    <br>
-    <br>
-
+    </ul>
+  </div>                     
+  <div id="right" style="float:right; width:50%;">
+    <ul class="list-group">
     {% for loan in loans %}
       {% for item in items %}
-        {% if item.id == loan.item_id%}
-        <li>{{ item.name}} ({{ loan.amount }}): {{ loan.user }} desde {{ loan.loan_date }} hasta {{ loan.refund_date }}</li>
+        {% if item.id == loan.item_id and loan.refund_date == None %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">{{ loan.user }}
+      <span class="badge badge-secundary cantidad">{{ item.name }}</span>
+      <span class="badge badge-secundary cantidad">{{ loan.amount }}</span>
+      <span class="badge badge-info fecha">{{ loan.loan_date }}</span>
+    </li>
         {% endif %}
       {% endfor%}
     {% endfor %}
-
+  </div>                   
+</div> 
+    
 </body>
 </html>

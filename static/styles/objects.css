@@ -1,5 +1,6 @@
 body {
     background-color: rgba(79, 129, 189, 0.6 );
+    font-family: "Roboto";
 }
 
 .navbar {
@@ -29,9 +30,16 @@ div#buscador{
     width:90%;
 }
 
-div#lista{
+div#TableContainer{
     padding-top: 20px;
     padding-left: 20%;
     padding-right: 20%;
     width:92%;
+}
+
+table#Tabla {
+    background-color: white;
+    padding-left: 300px;
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -10,16 +10,13 @@
     <a href="{{ url_for('index') }}">Página principal</a><br>
     <form action="{{ request.path }}" method="POST">
       Usuario:
-      <input type="number" min="0" max="100999999" name="user" required="true" placeholder="NIA">
+      <input type="number" min="100000000" max="100999999" name="user" required="true" placeholder="NIA">
 
       Cantidad:
       <input type="number" min="0" name="amount" required="true" placeholder="Cantidad">
 
       Fecha préstamo:
       <input type="date" name="loan_date" required="true" placeholder="Fecha préstamo">
-      <br>
-      <br>
-      <br>
 
       Objeto:
       <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objeto">

@@ -1,22 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
-    <title>Crear sanción</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
     <script src="{{ url_for('static', filename='search.js') }}"></script>
-</head>
+    <title>Crear sanción</title>
+  </head>
 
-<body>
-    <a href="{{ url_for('index') }}">Página principal</a><br>
+  <body>
+    <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+      <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+              <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
     <form action="{{ request.path }}" method="POST">
-      Usuario:
-      <input type="number" min="0" max="100999999" name="user" required="true" placeholder="NIA">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="user_prepend">Usuario</span>
+        </div>
+        <input type="number" class="form-control" placeholder="Nia del usuario" aria-label="Nombre" aria-describedby="basic-addon1" name="user" required="true" min="100000000" max="100999999">
+      </div>
 
-      Fecha sanción:
-      <input type="date" name="loan_date" required="true" placeholder="Fecha préstamo">
-      <br>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="fdate_prepend">Fecha inicial</span>
+        </div>
+        <input type="date" class="form-control" placeholder="Fecha inicial" aria-label="Fecha" aria-describedby="basic-addon1" name="initial_date" required="true">
+      </div><div class="input-group mb-3">
 
-       <input type="submit" value="Submit">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Fecha final</span>
+        </div>
+        <input type="date" class="form-control" placeholder="Fecha final" aria-label="Fecha" aria-describedby="basic-addon1" name="end_date" required="true">
+      </div>
+
+      <input type="submit" value="Enviar">
     </form>
-</body>
+  </body>
 </html>

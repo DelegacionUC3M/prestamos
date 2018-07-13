@@ -22,11 +22,12 @@ db.create_all()
 two_time_objects = ['electronico', 'electrico']
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
     if request.method == 'GET':
         return render_template(
             "index.html",
+            # items=item.Item.query.filter_by(amount=0),
             items=item.Item.query.all(),
             loans=loan.Loan.query.all())
 
@@ -38,7 +39,6 @@ def loan_create():
         usuario = request.form['user']
         # Objeto que ha sido prestado
         db_objeto = item.Item.query.get(request.form.getlist("objeto"))
-
         # Prestamos realizados por ese usuario
         prestamos_especiales = prestamos_normales = 0
         for prestamo in loan.Loan.query.filter_by(user=usuario):
@@ -95,7 +95,7 @@ def loan_create():
                 "index.html",
                 items=item.Item.query.all(),
                 loans=loan.Loan.query.all())
-    # GET request
+        # GET request
     else:
         free_items = item.Item.query.filter(item.Item.amount > 0)
         return render_template("loan_create.html", items=free_items)
@@ -214,8 +214,8 @@ def item_delete():
         free_items = []
         for prestamo in loan.Loan.query.filter_by(refund_date=None):
             id_prestamos.append(prestamo.item_id)
-        # Si el objeto no está prestado se mostrará
-        # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
+            # Si el objeto no está prestado se mostrará
+            # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
         for objeto in item.Item.query.filter(item.Item.amount > 0):
             if objeto.id not in id_prestamos:
                 free_items.append(objeto)
@@ -225,11 +225,11 @@ def item_delete():
 @app.route('/penalty/create', methods=['GET', 'POST'])
 def penalty_create():
     if request.method == 'POST':
-        usuario = request.form['user']
-        prestamo = loan.Loan.query.filter_by(user=usuario)
-        sancion = penalty.Penalty.query.filter_by(user=usuario)
+        user = request.form['user']
+        db_loan = loan.Loan.query.filter_by(user=user)
+        sanction = penalty.Penalty.query.filter_by(user=user)
         # El usuario no esta en la base de datos
-        if prestamo.count() == 0:
+        if db_loan.count() == 0:
             error = "El usuario no se encuentra en la base de datos"
             return render_template(
                 "index.html",
@@ -237,26 +237,25 @@ def penalty_create():
                 loans=loan.Loan.query.all(),
                 error=error)
         else:
-            fecha_sancion = datetime.date(datetime.now())  # Fecha actual
-            fecha_final = fecha_sancion + timedelta(days=(150))
+            fecha_sancion = request.form['initial_date']
+            fecha_final = request.form['end_date']
             # Si el usuario existe, actualizar la fecha final
-            if sancion.count() > 0:
-                sancion[0].sanction_date = fecha_sancion
-                sancion[0].penalty_date = fecha_final
+            if sanction.count() > 0:
+                sanction[0].sanction_date = fecha_sancion
+                sanction[0].penalty_date = fecha_final
                 db.session.commit()
 
-            # Se crea una sancion para el usuario
             else:
-                # El usuario no puede coger ningún objeto más en el cuatrimestre
-                sancion = penalty.Penalty(usuario, prestamo[0].id,
-                                          fecha_sancion, fecha_final)
+                # Se crea una sancion para el usuario
+                sancion = penalty.Penalty(user, db_loan[0].id, fecha_sancion,
+                                          fecha_final)
                 db.session.add(sancion)
                 db.session.commit()
             return render_template(
                 "index.html",
                 items=item.Item.query.all(),
                 loans=loan.Loan.query.all())
-    # GET request
+        # GET request
     else:
         return render_template('penalty_create.html')
 
@@ -273,11 +272,11 @@ def penalty_delete():
     current_date = datetime.date(datetime.now())  # Fecha actual
     if request.method == 'POST':
         # Itera sobre las sacciones enviadas
-        for sancion in request.form.getlist('penalties'):
-            db_penalty = penalty.Penalty.query.get(sancion)
+        for sanction in request.form.getlist('penalties'):
+            db_penalty = penalty.Penalty.query.get(sanction)
             # Marca la sanción como terminada
             db_penalty.penalty_date = current_date
-        db.session.commit()
+            db.session.commit()
         return render_template(
             "index.html",
             items=item.Item.query.all(),

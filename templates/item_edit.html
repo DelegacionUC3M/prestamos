@@ -1,15 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
-    <title>Editar objetos</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
     <script src="{{ url_for('static', filename='search.js') }}"></script>
-</head>
 
-<body>
-    <a href="{{ url_for('index') }}">Página principal</a>
+    <title>Editar objetos</title>
+  </head>
 
+  <body>
+
+    <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+      <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+              <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
 
     <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objetos">
     <select id="Opciones">
@@ -21,44 +75,44 @@
       <option value="6">Coeficiente</option>
     </select>
 
-  <form action="{{ request.path }}" method="POST">
-    <table id="Tabla">
-      <tr>
+    <form action="{{ request.path }}" method="POST">
+      <table id="Tabla">
+        <tr>
           <th>Objeto</th>
           <th>Cantidad</th>
           <th>Estado</th>
           <th>Tipo</th>
           <th>Duración préstamo</th>
           <th>% penalizacion</th>
-      </tr>
-    {% for item in items %}
-      <tr>
-      <td><input type="radio" name="objetos" id ="item_{{ item.id }}" value="{{ item.id }}"></td>
-      <td>{{ item.name }}</td>
-      <td>{{ item.amount }}</td>
-      <td>{{ item.state }}</td>
-      <td>{{ item.type }}</td>
-      <td>{{ item.loan_days }}</td>
-      <td>{{ item.penalty_coefficient }}</td>
-    </tr>
-    {% endfor %}
-    </table>
+        </tr>
+        {% for item in items %}
+        <tr>
+          <td><input type="radio" name="objetos" id ="item_{{ item.id }}" value="{{ item.id }}"></td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.amount }}</td>
+          <td>{{ item.state }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.loan_days }}</td>
+          <td>{{ item.penalty_coefficient }}</td>
+        </tr>
+        {% endfor %}
+      </table>
 
-    <br>
-    Nombre:
-    <input type="text" name="name" placeholder="Nombre">
-    Cantidad:
-    <input type="number" min="0" name="amount" placeholder="Cantidad">
-    Tipo:
-    <input type="text" name="type" placeholder="Tipo de objeto">
-    Estado:
-    <input type="text" name="state" placeholder="Defectuoso, funciona...">
-    Dias préstamo:
-    <input type="number" min="0" name="loan_days" placeholder="Duración max préstamo">
-    Ratio penalización:
-    <input type="number" min="0" step="1" name="penalty_coefficient" placeholder="Ratio penalización">
+      <br>
+      Nombre:
+      <input type="text" name="name" placeholder="Nombre">
+      Cantidad:
+      <input type="number" min="0" name="amount" placeholder="Cantidad">
+      Tipo:
+      <input type="text" name="type" placeholder="Tipo de objeto">
+      Estado:
+      <input type="text" name="state" placeholder="Defectuoso, funciona...">
+      Dias préstamo:
+      <input type="number" min="0" name="loan_days" placeholder="Duración max préstamo">
+      Ratio penalización:
+      <input type="number" min="0" step="1" name="penalty_coefficient" placeholder="Ratio penalización">
 
-    <input type="submit" value="Submit">
-  </form>
-</body>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
 </html>

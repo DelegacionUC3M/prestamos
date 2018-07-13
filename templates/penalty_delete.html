@@ -1,19 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
     <title>Borrar sanción</title>
-</head>
+  </head>
 
-<body>
-  <a href="{{ url_for('index') }}">Página principal</a><br>
-  <form action="{{ request.path }}" method="POST">
-      Sanción:<br>
+  <body>
+    <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+      <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+              <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <form action="{{ request.path }}" method="POST">
+      <table class="table" id="Tabla">
+        <thead>
+          <tr>
+            <th>Eliminar</th>
+            <th>Usuario</th>
+            <th>Fecha sanción</th>
+            <th>Fecha final</th>
+          </tr>
+        </thead>
+        <tbody>
           {% for penalty in penalties %}
-                  <input type="checkbox" id="penalty_{{penalty.id}}" name="penalties" value="{{ penalty.id }}">{{ penalty.user }} : {{ penalty.sanction_date }} : {{ penalty.penalty_date }}<br>
+          <tr>
+            <td><input type="checkbox" id="penalty_{{penalty.id}}" name="penalties" value="{{ penalty.id }}"></td>
+            <td>{{ penalty.user }}</td>
+            <td>{{ penalty.sanction_date }}</td>
+            <td>{{ penalty.penalty_date }}</td>
+          </tr>
           {% endfor %}
+        </tbody>
+      </table>
 
-      <input type="submit" value="Submit">
-  </form>
-</body>
+      {% if penalties is defined and pelaties|length > 0 %}
+      <input type="submit" value="Enviar">
+      {% endif %}
+
+    </form>
+  </body>
 </html>

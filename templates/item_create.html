@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
 
@@ -106,6 +107,7 @@
         <input type="number" class="form-control" placeholder="Ratio de penalización" aria-label="Cantidad" aria-describedby="basic-addon1" name="penalty_coefficient" required="true" min="0" step="1">
       </div>
 
+      <input type="reset" value="Borrar">
       <input type="submit" value="Guardar">
     </form>
 

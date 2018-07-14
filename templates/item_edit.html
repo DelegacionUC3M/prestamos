@@ -9,7 +9,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/list.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
 
     <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
 
@@ -23,14 +23,14 @@
     <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
       <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <!-- Dropdown de objetos -->
+                    <ul class="navbar-nav mr-auto">
+                      <!-- Dropdown de objetos -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Objetos
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Objetos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+                          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
               <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
               <div class="dropdown-divider"></div>
@@ -39,11 +39,11 @@
           </li>
           <!-- Dropdown de prestamos -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Prestamos
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Prestamos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+                          <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
@@ -51,11 +51,11 @@
           </li>
           <!-- Dropdown de prestamos -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Sanciones
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Sanciones
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+                          <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
@@ -65,54 +65,97 @@
       </div>
     </nav>
 
-    <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar objetos">
-    <select id="Opciones">
-      <option value="1">Nombre</option>
-      <option value="2">Cantidad</option>
-      <option value="3">Estado</option>
-      <option value="4">Tipo</option>
-      <option value="5">Dias</option>
-      <option value="6">Coeficiente</option>
-    </select>
-
     <form action="{{ request.path }}" method="POST">
-      <table id="Tabla">
-        <tr>
-          <th>Objeto</th>
-          <th>Cantidad</th>
-          <th>Estado</th>
-          <th>Tipo</th>
-          <th>Duración préstamo</th>
-          <th>% penalizacion</th>
-        </tr>
-        {% for item in items %}
-        <tr>
-          <td><input type="radio" name="objetos" id ="item_{{ item.id }}" value="{{ item.id }}"></td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.amount }}</td>
-          <td>{{ item.state }}</td>
-          <td>{{ item.type }}</td>
-          <td>{{ item.loan_days }}</td>
-          <td>{{ item.penalty_coefficient }}</td>
-        </tr>
-        {% endfor %}
+
+      <!-- TODO: Rellenar los campos del formulario al escoger un objeto en el selector -->
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Nombre</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Nombre del objeto" aria-label="Nombre" aria-describedby="basic-addon1" name="name" required="true" id="form_name">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Cantida</span>
+        </div>
+        <input type="number" class="form-control" placeholder="Cantidad inicial" aria-label="Cantidad" aria-describedby="basic-addon1" name="amount" required="true" min="0" id="form_amount">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Tipo</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Electrónico, papeleria..." aria-label="Cantidad" aria-describedby="basic-addon1" name="type" required="true" id="form_type">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Estado</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Defectuoso, funciona..." aria-label="Cantidad" aria-describedby="basic-addon1" name="state" required="true" id="form_state">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Días</span>
+        </div>
+        <input type="number" class="form-control" placeholder="Duración del prestamo" aria-label="Cantidad" aria-describedby="basic-addon1" name="loan_days" required="true" min="0" id="form_days">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Penalización</span>
+        </div>
+        <input type="number" class="form-control" placeholder="Ratio de penalización" aria-label="Cantidad" aria-describedby="basic-addon1" name="penalty_coefficient" required="true" min="0" step="1" id="form_penalty">
+      </div>
+
+      <div id="buscador">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Criterio</label>
+            <select class="custom-select" id="Opciones">
+              <option value="1">Nombre</option>
+              <option value="2">Cantidad</option>
+              <option value="3">Estado</option>
+              <option value="4">Tipo</option>
+              <option value="5">Dias</option>
+              <option value="6">Coeficiente</option>
+            </select>
+            <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
+          </div>
+        </div>
+      </div><!-- Div Buscador -->
+
+      <table class="table table-hover center" id="Tabla">
+        <thead>
+          <tr>
+            <th>Seleccion</th>
+            <th>Objeto</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Duración préstamo</th>
+            <th>% penalizacion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td><input onclick="fillForm(this.id)" type="radio" name="objetos" id="{{ loop.index }}" value="{{ item.id }}"></td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.amount }}</td>
+            <td>{{ item.state }}</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.loan_days }}</td>
+            <td>{{ item.penalty_coefficient }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
       </table>
 
-      <br>
-      Nombre:
-      <input type="text" name="name" placeholder="Nombre">
-      Cantidad:
-      <input type="number" min="0" name="amount" placeholder="Cantidad">
-      Tipo:
-      <input type="text" name="type" placeholder="Tipo de objeto">
-      Estado:
-      <input type="text" name="state" placeholder="Defectuoso, funciona...">
-      Dias préstamo:
-      <input type="number" min="0" name="loan_days" placeholder="Duración max préstamo">
-      Ratio penalización:
-      <input type="number" min="0" step="1" name="penalty_coefficient" placeholder="Ratio penalización">
-
-      <input type="submit" value="Submit">
+      <input type="reset" value="Borrar">
+      <input type="submit" value="Enviar">
     </form>
   </body>
 </html>

@@ -26,3 +26,22 @@ function searchItem() {
         }
     }
 }
+
+function fillForm(id) {
+    var table = document.getElementsByTagName("table")
+    var rows = table[0].rows
+    var cols = rows[id].getElementsByTagName("td");
+
+    document.getElementById("form_name").value = cols[1].innerHTML;
+    document.getElementById("form_amount").value = cols[2].innerHTML;
+    document.getElementById("form_type").value = cols[3].innerHTML;
+    document.getElementById("form_state").value = cols[4].innerHTML;
+    document.getElementById("form_days").value = cols[5].innerHTML;
+    document.getElementById("form_penalty").value = cols[6].innerHTML;
+    
+}
+
+// Las fechas son las del dia actual
+window.onload = function() {
+    document.getElementById("form_date").value = new Date().toISOString().substring(0, 10)
+}

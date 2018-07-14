@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask import Flask, render_template, request
 
@@ -27,7 +27,6 @@ def index():
     if request.method == 'GET':
         return render_template(
             "index.html",
-            # items=item.Item.query.filter_by(amount=0),
             items=item.Item.query.all(),
             loans=loan.Loan.query.all())
 
@@ -35,12 +34,17 @@ def index():
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
     if request.method == 'POST':
+        current_date = datetime.date(datetime.now())  # Fecha actual
         # Usuario que ha hecho el prestamos para comprobar
         usuario = request.form['user']
         # Objeto que ha sido prestado
         db_objeto = item.Item.query.get(request.form.getlist("objeto"))
+
         # Prestamos realizados por ese usuario
         prestamos_especiales = prestamos_normales = 0
+
+        # TODO: Crear prestamo para objetos electronicos
+        # Posible solucion: Comprobar si los prestamos se han hecho el mismo dia
         for prestamo in loan.Loan.query.filter_by(user=usuario):
             objeto = item.Item.query.get(prestamo.item_id)
             # Filtra los objetos dependiendo de si se pueden prestar varias veces o solo una
@@ -49,12 +53,13 @@ def loan_create():
             elif objeto.name == db_objeto.name:
                 prestamos_normales += prestamo.amount
 
-        # Sancion del usuario si existe
-        sancion = penalty.Penalty.query.filter_by(
-            user=int(usuario), penalty_date=None)
-
         cantidad = int(request.form['amount'])
-        # El usuario está sancionado
+
+        # Sancion del usuario si existe
+        sancion = penalty.Penalty.query.filter(
+            penalty.Penalty.penalty_date >= current_date,
+            penalty.Penalty.user == int(usuario))
+
         if sancion.count() >= 1:
             error = 'El usuario está sancionado'
             return render_template(
@@ -128,10 +133,6 @@ def loan_delete():
             items=item.Item.query.all(),
             loans=loan.Loan.query.all())
     else:
-        # Devuelve las dos listas en vez de una como debería ser
-
-        # porque jinja no devuelve bien los valores al estar las dos
-        # listas en un zip
         return render_template(
             'loan_delete.html',
             items=item.Item.query.all(),
@@ -142,9 +143,9 @@ def loan_delete():
 def item_create():
     if request.method == 'POST':
         loan_item = item.Item(
-            str(request.form['name']).lower(), int(request.form['amount']),
-            str(request.form['type']).lower(),
-            str(request.form['state']).lower(), int(request.form['loan_days']),
+            str(request.form['name']), int(request.form['amount']),
+            str(request.form['type']), str(request.form['state']),
+            int(request.form['loan_days']),
             float(request.form['penalty_coefficient']))
         # Añade el objeto a la db
         db.session.add(loan_item)

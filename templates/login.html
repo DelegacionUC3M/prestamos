@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Préstamos</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+
+  <body>
+
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light"> -->
+      <!--   <span class="navbar-brand">Prestamos</span> -->
+      <!-- </nav> -->
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand">Préstamos</a>
+        </div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if error %}
+    <p><strong>Error:</strong> {{ error }}
+    {% endif %}
+
+      <form action="{{ request.path }}" method="post">
+		<input name="nia" id="nia" placeholder="NIA" type="text">
+		<input id="password" name="password" placeholder="Contraseña" type="password">
+
+		<button type="submit" value="Entrar">Entrar</button>
+	  </form>
+</div>
+
+{% block scripts %}
+{% endblock %}
+</body>
+</html>

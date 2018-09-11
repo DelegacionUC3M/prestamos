@@ -17,6 +17,7 @@
   </head>
 
   <body>
+
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for message in messages %}
@@ -29,7 +30,7 @@
     <p><strong>Error:</strong> {{ error }}
       {% endif %}
 
-      <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
@@ -106,7 +107,7 @@
                 <th>Usuario</th>
                 <th>Objeto</th>
                 <th>Cantidad</th>
-                <th>Fecha</th>
+                <th>Fecha inicial</th>
               </tr>
             </thead>
             <tbody>

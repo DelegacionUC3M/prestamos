@@ -1,6 +1,9 @@
 from datetime import datetime
+import ldap
+import psycopg2
 
-from flask import Flask, render_template, request
+from flask import Flask, session, render_template, request, redirect, url_for
+from flask_session import Session
 
 from models import item, loan, penalty
 from models.connection import db
@@ -12,6 +15,7 @@ app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 
 app.secret_key = 'random'
+app.config['SESSION_TYPE'] = 'filesystem'
 
 # Enlaza la aplicacion y la base de datos
 db.app = app
@@ -20,16 +24,47 @@ db.create_all()
 
 # Objetos que se pueden prestar dos veces independientemente de la cantidad
 two_time_objects = ['electronico', 'electrico']
+# Objetos que se pueden prestar una vez independientemente de la cantidad
+one_time_objects = ['laboratorio']
 
 
-@app.route('/', methods=['GET'])
+# delegates_db = psycopg2.connect("dbname='delegates' user='taquillas' host='localhost' password='Yotun.Taquillas.2016'")
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template("login.html")
+    else:
+        usuario = str(request.form['nia'])
+        contraseña = str(request.form['password'])
+
+        # Creates a connection with the ldap server
+        ldap_server = ldap.initialize('ldaps://ldap.uc3m.es')
+        ldap_server.protocol_version = ldap.VERSION3
+        ldap_server.set_option(ldap.OPT_REFERRALS, 0)
+
+        base_dn = "ou=Gente,o=Universidad Carlos III,c=es"
+        username = "uid=" + usuario
+        # This returns a list of data of the user selected in the form
+        result = ldap_server.search_s(base_dn, ldap.SCOPE_SUBTREE, username)
+        # If we can create a connection with the user and the password then the user is valid
+        # Otherwise the credentials are not valid
+        try:
+            connect = ldap_server.simple_bind_s(str(result[0][0]), contraseña)
+            return redirect(url_for('index'))
+        except ldap.INVALID_CREDENTIALS:
+            error = "Usuario o contraseña incorrectos"
+            return render_template("login.html", error=error)
+
+@app.route('/index', methods=['GET'])
 def index():
     if request.method == 'GET':
         return render_template(
             "index.html",
             items=item.Item.query.all(),
             loans=loan.Loan.query.all())
-
 
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
@@ -41,15 +76,16 @@ def loan_create():
         db_objeto = item.Item.query.get(request.form.getlist("objeto"))
 
         # Prestamos realizados por ese usuario
-        prestamos_especiales = prestamos_normales = 0
+        prestamos_dos_veces = prestamos_una_vez = prestamos_normales = 0
 
-        # TODO: Crear prestamo para objetos electronicos
         # Posible solucion: Comprobar si los prestamos se han hecho el mismo dia
         for prestamo in loan.Loan.query.filter_by(user=usuario):
             objeto = item.Item.query.get(prestamo.item_id)
             # Filtra los objetos dependiendo de si se pueden prestar varias veces o solo una
             if objeto.type in two_time_objects:
-                prestamos_especiales += 1
+                prestamos_dos_veces += 1
+            elif objeto.type in one_time_objects:
+                prestamos_una_vez += 1
             elif objeto.name == db_objeto.name:
                 prestamos_normales += prestamo.amount
 
@@ -57,7 +93,7 @@ def loan_create():
 
         # Sancion del usuario si existe
         sancion = penalty.Penalty.query.filter(
-            penalty.Penalty.penalty_date >= current_date,
+            penalty.Penalty.penalty_date > current_date,
             penalty.Penalty.user == int(usuario))
 
         if sancion.count() >= 1:
@@ -70,9 +106,10 @@ def loan_create():
 
         # Si se le ha prestado dos veces el mismo objeto o ha pedido dos prestamos
         # de los prestamos unicos
-        if (db_objeto.type not in two_time_objects and prestamos_normales >= 2
-                or db_objeto.type in two_time_objects
-                and prestamos_especiales >= 2):
+        if (
+                (db_objeto.type not in two_time_objects and prestamos_normales >= 2) or
+                (db_objeto.type in two_time_objects and prestamos_dos_veces >= 2) or
+                (db_objeto.type in one_time_objects and prestamos_una_vez >= 1)):
             error = 'Máximo número de prestamos alcanzados'
             return render_template(
                 "index.html",
@@ -123,7 +160,7 @@ def loan_delete():
         for prestamo in deleted_loans:
             db_prestamo = loan.Loan.query.get(int(prestamo))
             objeto = item.Item.query.get(db_prestamo.item_id)
-            # Devuelve los objetos prestados a la db y
+            # Devuelve los objetos prestados a la db
             objeto.amount += db_prestamo.amount
             # Marca el objeto como devuelto
             db_prestamo.refund_date = current_date
@@ -248,7 +285,9 @@ def penalty_create():
 
             else:
                 # Se crea una sancion para el usuario
-                sancion = penalty.Penalty(user, db_loan[0].id, fecha_sancion,
+                sancion = penalty.Penalty(user,
+                                          db_loan[0].id,
+                                          fecha_sancion,
                                           fecha_final)
                 db.session.add(sancion)
                 db.session.commit()
@@ -288,6 +327,9 @@ def penalty_delete():
             penalties=penalty.Penalty.query.filter(
                 penalty.Penalty.penalty_date > current_date))
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    pass
 
 if __name__ == '__main__':
     app.run()

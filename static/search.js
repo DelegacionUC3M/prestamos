@@ -45,3 +45,7 @@ function fillForm(id) {
 window.onload = function() {
     document.getElementById("form_date").value = new Date().toISOString().substring(0, 10)
 }
+
+$(window).on('load', function(){
+    $('#errorModal').modal({show:true})
+})

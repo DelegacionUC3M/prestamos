@@ -2,11 +2,12 @@ from datetime import datetime
 import ldap
 import psycopg2
 
-from flask import Flask, session, render_template, request, redirect, url_for
-from flask_session import Session
+from flask import Flask, render_template, request, redirect, url_for, make_response
 
 from models import item, loan, penalty
 from models.connection import db
+
+from decorators import *
 
 # Inicializacion del objeto Flask
 app = Flask(__name__)
@@ -23,53 +24,62 @@ db.init_app(app)
 db.create_all()
 
 # Objetos que se pueden prestar dos veces independientemente de la cantidad
-two_time_objects = ['electronico', 'electrico']
+two_time_objects = ['electrónico', 'eléctrico']
 # Objetos que se pueden prestar una vez independientemente de la cantidad
 one_time_objects = ['laboratorio']
-
-
-# delegates_db = psycopg2.connect("dbname='delegates' user='taquillas' host='localhost' password='Yotun.Taquillas.2016'")
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """ Autentifica a los usuarios y comprueba su rol."""
     if request.method == 'GET':
         return render_template("login.html")
     else:
         usuario = str(request.form['nia'])
         contraseña = str(request.form['password'])
 
-        # Creates a connection with the ldap server
+        if not usuario or not contraseña:
+            # Es necesario introducir algun campo
+            error = "Usuario o contraseña incorrectos"
+            return render_template("login.html", error=error)
+
+        # Crea una conexion con el servidor ldap
         ldap_server = ldap.initialize('ldaps://ldap.uc3m.es')
         ldap_server.protocol_version = ldap.VERSION3
         ldap_server.set_option(ldap.OPT_REFERRALS, 0)
 
         base_dn = "ou=Gente,o=Universidad Carlos III,c=es"
         username = "uid=" + usuario
-        # This returns a list of data of the user selected in the form
+        # Devuelve una lista con la informacion del alumno buscado
         result = ldap_server.search_s(base_dn, ldap.SCOPE_SUBTREE, username)
-        # If we can create a connection with the user and the password then the user is valid
-        # Otherwise the credentials are not valid
+        # Si nos podemos conectar con esl usiario y contraseña continuamos
+        # Sino se han utilizado credenciales no validos
         try:
             connect = ldap_server.simple_bind_s(str(result[0][0]), contraseña)
-            return redirect(url_for('index'))
+            # delegates_db = psycopg2.connect("dbname='delegates' user='taquillas' host='localhost' password='Yotun.Taquillas.2016'")
+
+            # Crea una cookie con el rol del usuario valida para 2 horas
+            rol = "50"
+            res = make_response(redirect(url_for('index')))
+            res.set_cookie('rol', rol, max_age=60*60*2)
+            return res
         except ldap.INVALID_CREDENTIALS:
             error = "Usuario o contraseña incorrectos"
             return render_template("login.html", error=error)
 
 @app.route('/index', methods=['GET'])
 def index():
+    """ Página principal de la aplicación."""
     if request.method == 'GET':
-        return render_template(
-            "index.html",
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.all())
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
 
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
     if request.method == 'POST':
-        current_date = datetime.date(datetime.now())  # Fecha actual
+        current_date = datetime.date(datetime.now())
         # Usuario que ha hecho el prestamos para comprobar
         usuario = request.form['user']
         # Objeto que ha sido prestado
@@ -92,17 +102,15 @@ def loan_create():
         cantidad = int(request.form['amount'])
 
         # Sancion del usuario si existe
-        sancion = penalty.Penalty.query.filter(
-            penalty.Penalty.penalty_date > current_date,
-            penalty.Penalty.user == int(usuario))
+        sancion = penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date,
+                                               penalty.Penalty.user == int(usuario))
 
         if sancion.count() >= 1:
             error = 'El usuario está sancionado'
-            return render_template(
-                "index.html",
-                items=item.Item.query.all(),
-                loans=loan.Loan.query.all(),
-                error=error)
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all(),
+                                   error=error)
 
         # Si se le ha prestado dos veces el mismo objeto o ha pedido dos prestamos
         # de los prestamos unicos
@@ -111,51 +119,58 @@ def loan_create():
                 (db_objeto.type in two_time_objects and prestamos_dos_veces >= 2) or
                 (db_objeto.type in one_time_objects and prestamos_una_vez >= 1)):
             error = 'Máximo número de prestamos alcanzados'
-            return render_template(
-                "index.html",
-                items=item.Item.query.all(),
-                loans=loan.Loan.query.all(),
-                error=error)
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all(),
+                                   error=error)
 
         # Se han prestamo más objetos de los existentes
         if cantidad > db_objeto.amount:
             error = 'No hay tantos objetos para prestar'
-            return render_template(
-                "index.html",
-                items=item.Item.query.all(),
-                loans=loan.Loan.query.all(),
-                error=error)
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all(),
+                                   error=error)
 
         # El usuario puede coger prestado el objeto
         else:
-            loan_data = loan.Loan(db_objeto.id, int(usuario), cantidad,
-                                  request.form['loan_date'], None)
+            loan_data = loan.Loan(db_objeto.id,
+                                  int(usuario),
+                                  cantidad,
+                                  request.form['loan_date'],
+                                  None)
             db_objeto.amount -= cantidad
             db.session.add(loan_data)
             db.session.commit()
-            return render_template(
-                "index.html",
-                items=item.Item.query.all(),
-                loans=loan.Loan.query.all())
+            return render_template("index.html",
+                                   items=item.Item.query.all(),
+                                   loans=loan.Loan.query.all())
         # GET request
     else:
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol and user_rol < 100:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html", error=error))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+
         free_items = item.Item.query.filter(item.Item.amount > 0)
         return render_template("loan_create.html", items=free_items)
 
 
 @app.route('/loan/list', methods=['GET'])
 def loan_list():
-    return render_template(
-        'loan_list.html',
-        loans=loan.Loan.query.all(),
-        items=item.Item.query.all())
+    """ Muestra todos los prestamos."""
+    return render_template('loan_list.html',
+                           loans=loan.Loan.query.all(),
+                           items=item.Item.query.all())
 
 
 @app.route('/loan/delete', methods=['GET', 'POST'])
 def loan_delete():
+    """ Marca un préstamo como finalizado."""
     if request.method == 'POST':
-        current_date = datetime.date(datetime.now())  # Fecha actual
-        # Ids de los prestamos que se han seleccionado para borrar
+        current_date = datetime.date(datetime.now())
+        # Lista de los prestamos que se han seleccionado para borrar
         deleted_loans = request.form.getlist("prestamos")
         for prestamo in deleted_loans:
             db_prestamo = loan.Loan.query.get(int(prestamo))
@@ -165,46 +180,78 @@ def loan_delete():
             # Marca el objeto como devuelto
             db_prestamo.refund_date = current_date
             db.session.commit()
-        return render_template(
-            "index.html",
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.all())
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        return render_template(
-            'loan_delete.html',
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.filter_by(refund_date=None))
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol < 10:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all(),
+                                                error=error))
+        else:
+            res = make_response(render_template('loan_delete.html',
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.filter_by(refund_date=None)))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+        return res
 
 
 @app.route('/object/create', methods=['GET', 'POST'])
 def item_create():
+    """ Crea un objeto y lo añade a la base de datos."""
     if request.method == 'POST':
-        loan_item = item.Item(
-            str(request.form['name']), int(request.form['amount']),
-            str(request.form['type']), str(request.form['state']),
-            int(request.form['loan_days']),
-            float(request.form['penalty_coefficient']))
+        loan_item = item.Item(str(request.form['name']),
+                              int(request.form['amount']),
+                              str(request.form['type']),
+                              str(request.form['state']),
+                              int(request.form['loan_days']),
+                              float(request.form['penalty_coefficient']))
         # Añade el objeto a la db
         db.session.add(loan_item)
         db.session.commit()
-        return render_template(
-            "index.html",
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.all())
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        return render_template('item_create.html')
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol and user_rol < 50:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all(),
+                                                error=error))
+        else:
+            res = make_response(render_template('item_create.html'))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+        return res
 
 
 @app.route('/object/list', methods=['GET'])
 def item_list():
-    return render_template('item_list.html', items=item.Item.query.all())
+    """ Muestra todos los objetos que existen."""
+    user_rol = int(request.cookies.get('rol'))
+    if user_rol and user_rol < 10:
+        error = "No tiene permisos suficientes"
+        res = make_response(render_template("index.html",
+                                            items=item.Item.query.all(),
+                                            loans=loan.Loan.query.all(),
+                                            error=error))
+    else:
+        res = make_response(render_template('item_list.html', items=item.Item.query.all()))
+        res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+    return res
+
 
 
 @app.route('/object/edit', methods=['GET', 'POST'])
 def item_edit():
+    """ Permite editar objetos."""
     if request.method == 'POST':
-        # Obtiene la lista de objetos para editar
         db_object = item.Item.query.get(request.form.getlist("objetos"))
+
         nombre = request.form['name']
         cantidad = request.form['amount']
         tipo = request.form['type']
@@ -217,23 +264,31 @@ def item_edit():
         db_object.type = str(tipo) if tipo else db_object.type
         db_object.state = str(estado) if estado else db_object.state
         db_object.loan_days = int(dias) if dias else db_object.loan_days
-        db_object.penalty_coefficient = float(
-            coeficiente) if coeficiente else db_object.penalty_coefficient
+        db_object.penalty_coefficient = float(coeficiente) if coeficiente else db_object.penalty_coefficient
 
         db.session.commit()
-        return render_template(
-            'index.html',
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.all())
+        return render_template('index.html',
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        return render_template('item_edit.html', items=item.Item.query.all())
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol and user_rol < 50:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all(),
+                                                error=error))
+        else:
+            res = make_response(render_template('item_edit.html', items=item.Item.query.all()))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+        return res
 
 
 @app.route('/object/delete', methods=['GET', 'POST'])
 def item_delete():
+    """ Elimina un objeto de la base de datos."""
     if request.method == 'POST':
         # Obtiene la lista de objetos seleccionados
-        # Es una lista con los id de los objetos
         deleted_objects = request.form.getlist("objetos")
         # Busca los objeto/s a borrar en la db
         for object in deleted_objects:
@@ -241,75 +296,86 @@ def item_delete():
             db_object = item.Item.query.get(int(object))
             db.session.delete(db_object)
             db.session.commit()
-        return render_template(
-            "index.html",
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.all())
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        # Lista para guardar los id de los objetos prestados no devueltos
-        # y los objetos que estan libres
+        # Solo se pueden eliminar objetos que no están prestados
         id_prestamos = []
         free_items = []
         for prestamo in loan.Loan.query.filter_by(refund_date=None):
             id_prestamos.append(prestamo.item_id)
-            # Si el objeto no está prestado se mostrará
-            # free_items = item.Item.query.filter(~item.Item.id.in_(id_prestamos))
         for objeto in item.Item.query.filter(item.Item.amount > 0):
             if objeto.id not in id_prestamos:
                 free_items.append(objeto)
-        return render_template('item_delete.html', items=free_items)
+
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol and user_rol < 50:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all(),
+                                                error=error))
+        else:
+            res = make_response(render_template('item_delete.html', items=free_items))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+        return res
 
 
 @app.route('/penalty/create', methods=['GET', 'POST'])
 def penalty_create():
+    """ Sanciona a un usuario.
+    Si el usuario ya esta sancioando se actualiza la fecha de la sancion.
+    """
     if request.method == 'POST':
         user = request.form['user']
         db_loan = loan.Loan.query.filter_by(user=user)
         sanction = penalty.Penalty.query.filter_by(user=user)
-        # El usuario no esta en la base de datos
-        if db_loan.count() == 0:
-            error = "El usuario no se encuentra en la base de datos"
-            return render_template(
-                "index.html",
-                items=item.Item.query.all(),
-                loans=loan.Loan.query.all(),
-                error=error)
-        else:
-            fecha_sancion = request.form['initial_date']
-            fecha_final = request.form['end_date']
-            # Si el usuario existe, actualizar la fecha final
-            if sanction.count() > 0:
-                sanction[0].sanction_date = fecha_sancion
-                sanction[0].penalty_date = fecha_final
-                db.session.commit()
 
-            else:
-                # Se crea una sancion para el usuario
-                sancion = penalty.Penalty(user,
-                                          db_loan[0].id,
-                                          fecha_sancion,
-                                          fecha_final)
-                db.session.add(sancion)
-                db.session.commit()
-            return render_template(
-                "index.html",
-                items=item.Item.query.all(),
-                loans=loan.Loan.query.all())
-        # GET request
+        # Actualizar la fecha final
+        fecha_sancion = request.form['initial_date']
+        fecha_final = request.form['end_date']
+        if sanction.count() > 0:
+            sanction[0].sanction_date = fecha_sancion
+            sanction[0].penalty_date = fecha_final
+            db.session.commit()
+        else:
+            # Se crea una sancion para el usuario
+            sancion = penalty.Penalty(user,
+                                      db_loan[0].id,
+                                      fecha_sancion,
+                                      fecha_final)
+            db.session.add(sancion)
+            db.session.commit()
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        return render_template('penalty_create.html')
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol and user_rol < 100:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all(),
+                                                error=error))
+        else:
+            res = make_response(render_template(render_template('penalty_create.html')))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+        return res
 
 
 @app.route('/penalty/list', methods=['GET'])
 def penalty_list():
-    # Obtiene los prestamos de las sanciones
-    return render_template(
-        'penalty_list.html', penalties=penalty.Penalty.query.all())
+    """Muestra todas las sanciones."""
+    res = make_response(render_template("penalty_list.html", penalties=penalty.Penalty.query.all()))
+    res.set_cookie('rol', request.cookies.get('rol'), max_age=60*60*2)
+    return res
 
 
 @app.route('/penalty/delete', methods=['GET', 'POST'])
 def penalty_delete():
-    current_date = datetime.date(datetime.now())  # Fecha actual
+    """Elimina una sanción."""
+    current_date = datetime.date(datetime.now())
     if request.method == 'POST':
         # Itera sobre las sacciones enviadas
         for sanction in request.form.getlist('penalties'):
@@ -317,19 +383,39 @@ def penalty_delete():
             # Marca la sanción como terminada
             db_penalty.penalty_date = current_date
             db.session.commit()
-        return render_template(
-            "index.html",
-            items=item.Item.query.all(),
-            loans=loan.Loan.query.all())
+        return render_template("index.html",
+                               items=item.Item.query.all(),
+                               loans=loan.Loan.query.all())
     else:
-        return render_template(
-            'penalty_delete.html',
-            penalties=penalty.Penalty.query.filter(
-                penalty.Penalty.penalty_date > current_date))
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 100:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all(),
+                                                    error=error))
+            else:
+                res = make_response(render_template(render_template('penalty_delete.html',
+                                                                    penalties=penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date))))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
+                                                error=error))
+            return res
+    
 
-@app.route('/logout', methods=['POST'])
+
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    pass
+    """Cierra la sesión del usuario. """
+    # Eliminates the cookie and returns to login
+    res = make_response(redirect(url_for('login')))
+    res.set_cookie('rol', request.cookies.get('rol'), max_age=0)
+    return res
+
 
 if __name__ == '__main__':
     app.run()

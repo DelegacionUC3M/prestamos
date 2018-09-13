@@ -18,114 +18,124 @@
 
   <body>
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-
     {% if error %}
-    <p><strong>Error:</strong> {{ error }}
-      {% endif %}
-
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <!-- Dropdown de objetos -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Objetos
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
-                <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
-                <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
-              </div>
-            </li>
-            <!-- Dropdown de prestamos -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Prestamos
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
-                <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
-              </div>
-            </li>
-            <!-- Dropdown de prestamos -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Sanciones
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
-                <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
-              </div>
-            </li>
-          </ul>
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="errorModalLabel">Error</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {{ error }}
+          </div>
         </div>
-      </nav>
+      </div>
+    </div>
+    {% endif %}
 
-      <div id="container" style="width:100%;">                                   
-        <div id="left" style="float:left; width:50%;">
-          <table id="Tabla" class="table table-hover center">
-            <thead>
-              <tr>
-                <th>Objeto</th>
-                <th>Estado</th>
-                <th>Cantidad</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in items %}
-              {% if item.amount == 0 %}
-              <tr>
-                <td>{{ item.name }}</td>
-                <td>{{ item.state }}</td>
-                <td>{{ item.amount }}</td>
-              </tr>
-              {% endif %}
-              {% endfor %}
-            </tbody>
-          </table>
 
-        </div> <!-- Left container -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
+              <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
+            </div>
+          </li>
+        </ul>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+        </span>
+      </div>
+    </nav>
 
-        <div id="right" style="float:right; width:50%;">
-          <table id="Tabla" class="table table-hover center">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Objeto</th>
-                <th>Cantidad</th>
-                <th>Fecha inicial</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for loan in loans %}
-              {% for item in items %}
-              {% if item.id == loan.item_id and loan.refund_date == None %}
-              <tr>
-                <td>{{ loan.user }}</td>
-                <td>{{ item.name }}</td>
-                <td>{{ loan.amount }}</td>
-                <td>{{ loan.loan_date }}</td>
-              </tr>
-              {% endif %}
-              {% endfor %}
-              {% endfor %}
-            </tbody>
-          </table>
-        </div><!-- Right container -->
-      </div><!-- Main container -->
+    <div id="container" style="width:100%;">                                   
+      <div id="left" style="float:left; width:50%;">
+        <table id="Tabla" class="table table-hover center">
+          <thead>
+            <tr>
+              <th>Objeto</th>
+              <th>Estado</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            {% if item.amount == 0 %}
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.state }}</td>
+              <td>{{ item.amount }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div> <!-- Left container -->
+
+      <div id="right" style="float:right; width:50%;">
+        <table id="Tabla" class="table table-hover center">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Objeto</th>
+              <th>Cantidad</th>
+              <th>Fecha inicial</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for loan in loans %}
+            {% for item in items %}
+            {% if item.id == loan.item_id and loan.refund_date == None %}
+            <tr>
+              <td>{{ loan.user }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ loan.amount }}</td>
+              <td>{{ loan.loan_date }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div><!-- Right container -->
+    </div><!-- Main container -->
   </body>
 </html>

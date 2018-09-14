@@ -7,7 +7,6 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 from models import item, loan, penalty
 from models.connection import db
 
-from decorators import *
 
 # Inicializacion del objeto Flask
 app = Flask(__name__)
@@ -68,13 +67,28 @@ def login():
             error = "Usuario o contraseña incorrectos"
             return render_template("login.html", error=error)
 
-@app.route('/index', methods=['GET'])
+
+@app.route('/index', methods=['GET', 'POST'])
 def index():
     """ Página principal de la aplicación."""
     if request.method == 'GET':
-        return render_template("index.html",
-                               items=item.Item.query.all(),
-                               loans=loan.Loan.query.all())
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 10:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("login.html", error=error))
+            else:
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all()))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
+                                                error=error))
+            return res
+
 
 @app.route('/loan/create', methods=['GET', 'POST'])
 def loan_create():
@@ -147,22 +161,45 @@ def loan_create():
                                    loans=loan.Loan.query.all())
         # GET request
     else:
-        user_rol = int(request.cookies.get('rol'))
-        if user_rol and user_rol < 100:
-            error = "No tiene permisos suficientes"
-            res = make_response(render_template("index.html", error=error))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
-
-        free_items = item.Item.query.filter(item.Item.amount > 0)
-        return render_template("loan_create.html", items=free_items)
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 10:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html", error=error))
+            else:
+                free_items = item.Item.query.filter(item.Item.amount > 0)
+                res = make_response(render_template("loan_create.html", items=free_items))
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
+                                                error=error))
+            return res
 
 
 @app.route('/loan/list', methods=['GET'])
 def loan_list():
     """ Muestra todos los prestamos."""
-    return render_template('loan_list.html',
-                           loans=loan.Loan.query.all(),
-                           items=item.Item.query.all())
+    try:
+        user_rol = int(request.cookies.get('rol'))
+        if user_rol < 10:
+            error = "No tiene permisos suficientes"
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all(),
+                                                error=error))
+        else:
+            res = make_response(render_template('loan_list.html',
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.filter_by(refund_date=None)))
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+        return res
+    except TypeError:
+        error = "No ha iniciado sesion"
+        res = make_response(render_template("login.html",
+                                            error=error))
+        return res
 
 
 @app.route('/loan/delete', methods=['GET', 'POST'])
@@ -184,19 +221,25 @@ def loan_delete():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
-        user_rol = int(request.cookies.get('rol'))
-        if user_rol < 10:
-            error = "No tiene permisos suficientes"
-            res = make_response(render_template("index.html",
-                                                items=item.Item.query.all(),
-                                                loans=loan.Loan.query.all(),
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 10:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all(),
+                                                    error=error))
+            else:
+                res = make_response(render_template('loan_delete.html',
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.filter_by(refund_date=None)))
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
                                                 error=error))
-        else:
-            res = make_response(render_template('loan_delete.html',
-                                                items=item.Item.query.all(),
-                                                loans=loan.Loan.query.filter_by(refund_date=None)))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
-        return res
+            return res
 
 
 @app.route('/object/create', methods=['GET', 'POST'])
@@ -216,34 +259,45 @@ def item_create():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 50:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all(),
+                                                    error=error))
+            else:
+                res = make_response(render_template('item_create.html'))
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
+                                                error=error))
+            return res
+
+
+@app.route('/object/list', methods=['GET'])
+def item_list():
+    """ Muestra todos los objetos que existen."""
+    try:
         user_rol = int(request.cookies.get('rol'))
-        if user_rol and user_rol < 50:
+        if user_rol < 10:
             error = "No tiene permisos suficientes"
             res = make_response(render_template("index.html",
                                                 items=item.Item.query.all(),
                                                 loans=loan.Loan.query.all(),
                                                 error=error))
         else:
-            res = make_response(render_template('item_create.html'))
+            res = make_response(render_template('item_list.html', items=item.Item.query.all()))
             res.set_cookie('rol', str(user_rol), max_age=60*60*2)
         return res
-
-
-@app.route('/object/list', methods=['GET'])
-def item_list():
-    """ Muestra todos los objetos que existen."""
-    user_rol = int(request.cookies.get('rol'))
-    if user_rol and user_rol < 10:
-        error = "No tiene permisos suficientes"
-        res = make_response(render_template("index.html",
-                                            items=item.Item.query.all(),
-                                            loans=loan.Loan.query.all(),
+    except TypeError:
+        error = "No ha iniciado sesion"
+        res = make_response(render_template("login.html",
                                             error=error))
-    else:
-        res = make_response(render_template('item_list.html', items=item.Item.query.all()))
-        res.set_cookie('rol', str(user_rol), max_age=60*60*2)
-    return res
-
+        return res
 
 
 @app.route('/object/edit', methods=['GET', 'POST'])
@@ -271,17 +325,23 @@ def item_edit():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
-        user_rol = int(request.cookies.get('rol'))
-        if user_rol and user_rol < 50:
-            error = "No tiene permisos suficientes"
-            res = make_response(render_template("index.html",
-                                                items=item.Item.query.all(),
-                                                loans=loan.Loan.query.all(),
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 50:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all(),
+                                                    error=error))
+            else:
+                res = make_response(render_template('item_edit.html', items=item.Item.query.all()))
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
                                                 error=error))
-        else:
-            res = make_response(render_template('item_edit.html', items=item.Item.query.all()))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
-        return res
+            return res
 
 
 @app.route('/object/delete', methods=['GET', 'POST'])
@@ -309,17 +369,23 @@ def item_delete():
             if objeto.id not in id_prestamos:
                 free_items.append(objeto)
 
-        user_rol = int(request.cookies.get('rol'))
-        if user_rol and user_rol < 50:
-            error = "No tiene permisos suficientes"
-            res = make_response(render_template("index.html",
-                                                items=item.Item.query.all(),
-                                                loans=loan.Loan.query.all(),
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 50:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all(),
+                                                    error=error))
+            else:
+                res = make_response(render_template('item_delete.html', items=free_items))
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
                                                 error=error))
-        else:
-            res = make_response(render_template('item_delete.html', items=free_items))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
-        return res
+            return res
 
 
 @app.route('/penalty/create', methods=['GET', 'POST'])
@@ -351,23 +417,30 @@ def penalty_create():
                                items=item.Item.query.all(),
                                loans=loan.Loan.query.all())
     else:
-        user_rol = int(request.cookies.get('rol'))
-        if user_rol and user_rol < 100:
-            error = "No tiene permisos suficientes"
-            res = make_response(render_template("index.html",
-                                                items=item.Item.query.all(),
-                                                loans=loan.Loan.query.all(),
+        try:
+            user_rol = int(request.cookies.get('rol'))
+            if user_rol < 100:
+                error = "No tiene permisos suficientes"
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all(),
+                                                    error=error))
+            else:
+                res = make_response(render_template(render_template('penalty_create.html')))
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            return res
+        except TypeError:
+            error = "No ha iniciado sesion"
+            res = make_response(render_template("login.html",
                                                 error=error))
-        else:
-            res = make_response(render_template(render_template('penalty_create.html')))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
-        return res
+            return res
 
 
 @app.route('/penalty/list', methods=['GET'])
 def penalty_list():
     """Muestra todas las sanciones."""
-    res = make_response(render_template("penalty_list.html", penalties=penalty.Penalty.query.all()))
+    res = make_response(render_template("penalty_list.html",
+                                        penalties=penalty.Penalty.query.all()))
     res.set_cookie('rol', request.cookies.get('rol'), max_age=60*60*2)
     return res
 
@@ -398,14 +471,14 @@ def penalty_delete():
             else:
                 res = make_response(render_template(render_template('penalty_delete.html',
                                                                     penalties=penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date))))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
             return res
         except TypeError:
             error = "No ha iniciado sesion"
             res = make_response(render_template("login.html",
                                                 error=error))
             return res
-    
+        
 
 
 @app.route('/logout', methods=['GET', 'POST'])

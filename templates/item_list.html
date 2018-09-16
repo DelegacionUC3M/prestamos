@@ -63,6 +63,12 @@
             </div>
           </li>
         </ul>
+        <span class="navbar-text">
+          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+        </span>
       </div>
     </nav>
 
@@ -79,8 +85,8 @@
               <option value="4">Dias</option>
               <option value="5">Coeficiente</option>
             </select>
-            <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
           </div>
+          <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
         </div>
       </div><!-- Div Buscador -->
 

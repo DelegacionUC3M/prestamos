@@ -24,23 +24,24 @@ span.badge-secundary{
 
 a.navbar-brand {
     background-color: rgba(255, 192, 93, 0.6);
-    border-radius: 3px;
+    border-radius: 5px;
     margin: 10px;
     padding: 10px;
 }
 
 div#container {
-    padding-top: 5px;
+    padding-top: 5vh;
+    width: 100vw;
 }
 
 div#left {
-    padding-left: 0.6vw;
-    padding-right: 0.6vw;
+    padding-left: 0.2vw;
+    padding-right: 0.1vw;
 }
 
 div#right {
-    padding-right: 0.6vw;
-    padding-left: 0.6vw;
+    padding-right: 0.2vw;
+    padding-left: 0.1vw;
 }
 
 table#Tabla {
@@ -52,4 +53,28 @@ table#Tabla {
 
 .mb-3, .my-3 {
     margin-bottom: 10px !important;
+}
+
+
+#login_form {
+    margin-top: 20vh;
+}
+
+input {
+    display: block;
+    margin: 0 auto;
+    width: 300px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+}
+
+button#access {
+    width: 300px;
+    box-sizing: border-box;
+    padding: 5px 15px;
+    text-shadow: -1px 0 4px rgba(0, 0, 0, 0.55);
+    margin: 30px auto 0;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.45);
+    border-width: 3px;
+    margin-left: 39vw;
 }

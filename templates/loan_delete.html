@@ -20,14 +20,14 @@
     <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
       <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <!-- Dropdown de objetos -->
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
           <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Objetos
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
               <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
               <div class="dropdown-divider"></div>
@@ -36,11 +36,11 @@
           </li>
           <!-- Dropdown de prestamos -->
           <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Prestamos
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
@@ -48,65 +48,71 @@
           </li>
           <!-- Dropdown de prestamos -->
           <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Sanciones
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
             </div>
           </li>
         </ul>
+        <span class="navbar-text">
+          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+        </span>
       </div>
     </nav>
 
     <form action="{{ request.path }}" method="POST">
 
-        <div id="buscador">
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="inputGroupSelect01">Criterio</label>
-              <select class="custom-select" id="Opciones">
-                <option value="1">Usuario</option>
-                <option value="2">Objeto</option>
-                <option value="3">Cantidad</option>
-                <option value="4">Fecha</option>
-                <option value="5">Devolución</option>
-              </select>
-              <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
-            </div>
+      <div id="buscador">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Criterio</label>
+            <select class="custom-select" id="Opciones">
+              <option value="1">Usuario</option>
+              <option value="2">Objeto</option>
+              <option value="3">Cantidad</option>
+              <option value="4">Fecha</option>
+              <option value="5">Devolución</option>
+            </select>
+            <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
           </div>
-        </div><!-- Div Buscador -->
+        </div>
+      </div><!-- Div Buscador -->
 
-        <table class="table" id="Tabla">
-          <thead>
-            <tr>
-              <th>Eliminar</th>
-              <th>Usuario</th>
-              <th>Cantidad</th>
-              <th>Objeto</th>
-              <th>Fecha préstamo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for loan in loans %}
-            {% for item in items %}
-            {% if item.id == loan.item_id %}
-            <tr>
-              <td><input type="checkbox" id="loan_{{ loan.id }}" name="prestamos" value="{{ loan.id }}"></td>
-              <td>{{ loan.user }}</td>
-              <td>{{ loan.amount }}</td>
-              <td>{{ item.name }}</td>
-              <td>{{ loan.loan_date }}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
-          </tbody>
-        </table>
-        <input type="submit" value="Enviar">
+      <table class="table" id="Tabla">
+        <thead>
+          <tr>
+            <th>Eliminar</th>
+            <th>Usuario</th>
+            <th>Cantidad</th>
+            <th>Objeto</th>
+            <th>Fecha préstamo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in loans %}
+          {% for item in items %}
+          {% if item.id == loan.item_id %}
+          <tr>
+            <td><input type="checkbox" id="loan_{{ loan.id }}" name="prestamos" value="{{ loan.id }}"></td>
+            <td>{{ loan.user }}</td>
+            <td>{{ loan.amount }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ loan.loan_date }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+      <input type="submit" value="Enviar">
     </form>
 
   </body>

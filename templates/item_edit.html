@@ -23,14 +23,14 @@
     <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
       <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                      <!-- Dropdown de objetos -->
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
           <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Objetos
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
               <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
               <div class="dropdown-divider"></div>
@@ -39,11 +39,11 @@
           </li>
           <!-- Dropdown de prestamos -->
           <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Prestamos
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
@@ -51,17 +51,23 @@
           </li>
           <!-- Dropdown de prestamos -->
           <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Sanciones
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
+              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
               <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
             </div>
           </li>
         </ul>
+        <span class="navbar-text">
+          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+        </span>
       </div>
     </nav>
 
@@ -110,6 +116,9 @@
         <input type="number" class="form-control" placeholder="Ratio de penalización" aria-label="Cantidad" aria-describedby="basic-addon1" name="penalty_coefficient" required="true" min="0" step="1" id="form_penalty">
       </div>
 
+      <input class="input_select" type="submit" value="Guardar">
+      <input class="input_select" type="reset" value="Borrar">
+
       <div id="buscador">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -122,8 +131,8 @@
               <option value="5">Dias</option>
               <option value="6">Coeficiente</option>
             </select>
-            <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
           </div>
+            <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
         </div>
       </div><!-- Div Buscador -->
 
@@ -154,8 +163,6 @@
         </tbody>
       </table>
 
-      <input type="reset" value="Borrar">
-      <input type="submit" value="Enviar">
     </form>
   </body>
 </html>

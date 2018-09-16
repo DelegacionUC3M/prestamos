@@ -49,12 +49,13 @@
       </div>
     </div>
 
-    <form action="{{ request.path }}" method="post">
+    <form id="login_form" action="{{ request.path }}" method="post">
 	  <input name="nia" id="nia" placeholder="NIA" type="text">
 	  <input id="password" name="password" placeholder="Contraseña" type="password">
 
-	  <button type="submit" value="Entrar">Entrar</button>
+	  <button id="access" class="btn btn-primary btn-sm" type="submit" value="Entrar">Entrar</button>
 	</form>
+
 </div>
 
 </body>

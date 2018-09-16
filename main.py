@@ -27,6 +27,11 @@ two_time_objects = ['electrónico', 'eléctrico']
 # Objetos que se pueden prestar una vez independientemente de la cantidad
 one_time_objects = ['laboratorio']
 
+# Distintos roles para restringir el acceso
+ROL_USER = 10
+ROL_ADMIN = 50
+ROL_MANAGER = 100
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
@@ -56,10 +61,15 @@ def login():
         # Sino se han utilizado credenciales no validos
         try:
             connect = ldap_server.simple_bind_s(str(result[0][0]), contraseña)
-            # delegates_db = psycopg2.connect("dbname='delegates' user='taquillas' host='localhost' password='Yotun.Taquillas.2016'")
+            delegates_db = psycopg2.connect("dbname='delegates' user='taquillas' host='localhost' password='Yotun.Taquillas.2016'")
+            cur = delegates_db.cursor()
+            query = "SELECT id_person FROM {} WHERE nia='{}';".format('person',usuario)
+            id_user = cur.execute(query)
+            query = "SELECT role FROM {} WHERE id_person='{}';".format('privilege',id_user[0])
+            rol_user = cur.execute(query)
 
             # Crea una cookie con el rol del usuario valida para 2 horas
-            rol = "50"
+            rol = str(rol_user[0])
             res = make_response(redirect(url_for('index')))
             res.set_cookie('rol', rol, max_age=60*60*2)
             return res
@@ -74,14 +84,14 @@ def index():
     if request.method == 'GET':
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 10:
+            if user_rol < ROL_USER:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("login.html", error=error))
             else:
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
                                                     loans=loan.Loan.query.all()))
-            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
             return res
         except TypeError:
             error = "No ha iniciado sesion"
@@ -103,7 +113,7 @@ def loan_create():
         prestamos_dos_veces = prestamos_una_vez = prestamos_normales = 0
 
         # Posible solucion: Comprobar si los prestamos se han hecho el mismo dia
-        for prestamo in loan.Loan.query.filter_by(user=usuario):
+        for prestamo in loan.Loan.query.filter_by(nia=usuario):
             objeto = item.Item.query.get(prestamo.item_id)
             # Filtra los objetos dependiendo de si se pueden prestar varias veces o solo una
             if objeto.type in two_time_objects:
@@ -117,7 +127,7 @@ def loan_create():
 
         # Sancion del usuario si existe
         sancion = penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date,
-                                               penalty.Penalty.user == int(usuario))
+                                               penalty.Penalty.nia == int(usuario))
 
         if sancion.count() >= 1:
             error = 'El usuario está sancionado'
@@ -163,7 +173,7 @@ def loan_create():
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 10:
+            if user_rol < ROL_USER:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html", error=error))
             else:
@@ -183,7 +193,7 @@ def loan_list():
     """ Muestra todos los prestamos."""
     try:
         user_rol = int(request.cookies.get('rol'))
-        if user_rol < 10:
+        if user_rol < ROL_USER:
             error = "No tiene permisos suficientes"
             res = make_response(render_template("index.html",
                                                 items=item.Item.query.all(),
@@ -223,7 +233,7 @@ def loan_delete():
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 10:
+            if user_rol < ROL_USER:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
@@ -261,7 +271,7 @@ def item_create():
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 50:
+            if user_rol < ROL_ADMIN:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
@@ -283,7 +293,7 @@ def item_list():
     """ Muestra todos los objetos que existen."""
     try:
         user_rol = int(request.cookies.get('rol'))
-        if user_rol < 10:
+        if user_rol < ROL_USER:
             error = "No tiene permisos suficientes"
             res = make_response(render_template("index.html",
                                                 items=item.Item.query.all(),
@@ -327,7 +337,7 @@ def item_edit():
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 50:
+            if user_rol < ROL_ADMIN:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
@@ -371,7 +381,7 @@ def item_delete():
 
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 50:
+            if user_rol < ROL_ADMIN:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
@@ -395,8 +405,8 @@ def penalty_create():
     """
     if request.method == 'POST':
         user = request.form['user']
-        db_loan = loan.Loan.query.filter_by(user=user)
-        sanction = penalty.Penalty.query.filter_by(user=user)
+        db_loan = loan.Loan.query.filter_by(nia=user)
+        sanction = penalty.Penalty.query.filter_by(nia=user)
 
         # Actualizar la fecha final
         fecha_sancion = request.form['initial_date']
@@ -419,14 +429,14 @@ def penalty_create():
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 100:
+            if user_rol < ROL_MANAGER:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
                                                     loans=loan.Loan.query.all(),
                                                     error=error))
             else:
-                res = make_response(render_template(render_template('penalty_create.html')))
+                res = make_response(render_template('penalty_create.html'))
                 res.set_cookie('rol', str(user_rol), max_age=60*60*2)
             return res
         except TypeError:
@@ -462,15 +472,15 @@ def penalty_delete():
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
-            if user_rol < 100:
+            if user_rol < ROL_MANAGER:
                 error = "No tiene permisos suficientes"
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
                                                     loans=loan.Loan.query.all(),
                                                     error=error))
             else:
-                res = make_response(render_template(render_template('penalty_delete.html',
-                                                                    penalties=penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date))))
+                res = make_response(render_template('penalty_delete.html',
+                                                    penalties=penalty.Penalty.query.filter(penalty.Penalty.penalty_date > current_date)))
                 res.set_cookie('rol', str(user_rol), max_age=60*60*2)
             return res
         except TypeError:

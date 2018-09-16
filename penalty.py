@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from main import db
 from models import item, loan, penalty
 
-current_day = datetime.date(datetime.now())  # Fecha actual
+current_day = datetime.date(datetime.now())
 # Lista de prestamos que aun no se han devuelto
 prestamos = loan.Loan.query.filter_by(refund_date=None)
 
@@ -21,7 +21,7 @@ for prestamo in prestamos:
             timedelta(days=abs(current_day.day - fecha_devolucion.day)
                       * object.penalty_coefficient)
         # Crea la sancion para almacenarla
-        db_penalty = penalty.Penalty(prestamo.user,
+        db_penalty = penalty.Penalty(prestamo.nia,
                                      prestamo.id,
                                      current_day,
                                      penalty_date)

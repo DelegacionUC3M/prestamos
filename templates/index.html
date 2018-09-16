@@ -78,7 +78,12 @@
               <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
             </div>
           </li>
+          <li>
+          </li>
         </ul>
+        <span class="navbar-text">
+          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+        </span>
         <span class="navbar-text">
           <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
         </span>
@@ -125,7 +130,7 @@
             {% for item in items %}
             {% if item.id == loan.item_id and loan.refund_date == None %}
             <tr>
-              <td>{{ loan.user }}</td>
+              <td>{{ loan.nia }}</td>
               <td>{{ item.name }}</td>
               <td>{{ loan.amount }}</td>
               <td>{{ loan.loan_date }}</td>
@@ -135,6 +140,7 @@
             {% endfor %}
           </tbody>
         </table>
+
       </div><!-- Right container -->
     </div><!-- Main container -->
   </body>

@@ -61,6 +61,12 @@
             </div>
           </li>
         </ul>
+        <span class="navbar-text">
+          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+        </span>
       </div>
     </nav>
 
@@ -107,8 +113,8 @@
         <input type="number" class="form-control" placeholder="Ratio de penalización" aria-label="Cantidad" aria-describedby="basic-addon1" name="penalty_coefficient" required="true" min="0" step="1">
       </div>
 
-      <input type="reset" value="Borrar">
-      <input type="submit" value="Guardar">
+      <input class="input_select" type="submit" value="Guardar">
+      <input class="input_select" type="reset" value="Borrar">
     </form>
 
   </body>

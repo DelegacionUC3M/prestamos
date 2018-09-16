@@ -60,6 +60,12 @@
             </div>
           </li>
         </ul>
+        <span class="navbar-text">
+          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+        </span>
       </div>
     </nav>
 
@@ -84,7 +90,7 @@
         <input type="date" class="form-control" placeholder="Fecha final" aria-label="Fecha" aria-describedby="basic-addon1" name="end_date" required="true">
       </div>
 
-      <input type="submit" value="Enviar">
+      <input class="input_select" type="submit" value="Guardar">
     </form>
   </body>
 </html>

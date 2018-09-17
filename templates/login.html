@@ -9,8 +9,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/prestamos/static/styles/index.css">
+    <link rel="shortchut icon" type="image/x-icon" href="/prestamos/static/img/favicon.ico">
 
     <script>
       $(window).on('load', function(){
@@ -49,7 +49,7 @@
       </div>
     </div>
 
-    <form id="login_form" action="{{ request.path }}" method="post">
+    <form id="login_form" action="/prestamos/login" method="post">
 	  <input name="nia" id="nia" placeholder="NIA" type="text">
 	  <input id="password" name="password" placeholder="Contraseña" type="password">
 

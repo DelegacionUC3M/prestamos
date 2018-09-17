@@ -15,7 +15,6 @@ app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 
 app.secret_key = 'random'
-app.config['SESSION_TYPE'] = 'filesystem'
 
 # Enlaza la aplicacion y la base de datos
 db.app = app
@@ -23,9 +22,9 @@ db.init_app(app)
 db.create_all()
 
 # Objetos que se pueden prestar dos veces independientemente de la cantidad
-two_time_objects = ['electrónico', 'eléctrico']
+two_time_objects = ['Electrónico', 'Eléctrico']
 # Objetos que se pueden prestar una vez independientemente de la cantidad
-one_time_objects = ['laboratorio']
+one_time_objects = ['Laboratorio']
 
 # Distintos roles para restringir el acceso
 ROL_USER = 10
@@ -33,7 +32,6 @@ ROL_ADMIN = 50
 ROL_MANAGER = 100
 
 
-@app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """ Autentifica a los usuarios y comprueba su rol."""
@@ -63,14 +61,23 @@ def login():
             connect = ldap_server.simple_bind_s(str(result[0][0]), contraseña)
             delegates_db = psycopg2.connect("dbname='delegates' user='taquillas' host='localhost' password='Yotun.Taquillas.2016'")
             cur = delegates_db.cursor()
-            query = "SELECT id_person FROM {} WHERE nia='{}';".format('person',usuario)
-            id_user = cur.execute(query)
-            query = "SELECT role FROM {} WHERE id_person='{}';".format('privilege',id_user[0])
-            rol_user = cur.execute(query)
+            query = "SELECT id_person FROM {} WHERE nia={};".format('person',usuario)
+            cur.execute(query)
+            id_user = cur.fetchone()
+            cur = delegates_db.cursor()
+            query = "SELECT role FROM {} WHERE id_person={};".format('privilege',id_user[0])
+            cur.execute(query)
+            rol_user = cur.fetchone()
+
+            if rol_user:
+                rol = str(rol_user[0])
+            else:
+                rol = "10"
 
             # Crea una cookie con el rol del usuario valida para 2 horas
-            rol = str(rol_user[0])
-            res = make_response(redirect(url_for('index')))
+            res = make_response(render_template("index.html",
+                                                items=item.Item.query.all(),
+                                                loans=loan.Loan.query.all()))
             res.set_cookie('rol', rol, max_age=60*60*2)
             return res
         except ldap.INVALID_CREDENTIALS:
@@ -91,7 +98,7 @@ def index():
                 res = make_response(render_template("index.html",
                                                     items=item.Item.query.all(),
                                                     loans=loan.Loan.query.all()))
-                res.set_cookie('rol', str(user_rol), max_age=60*60*2)
+            res.set_cookie('rol', str(user_rol), max_age=60*60*2)
             return res
         except TypeError:
             error = "No ha iniciado sesion"
@@ -495,10 +502,10 @@ def penalty_delete():
 def logout():
     """Cierra la sesión del usuario. """
     # Eliminates the cookie and returns to login
-    res = make_response(redirect(url_for('login')))
+    res = make_response(render_template('login.html'))
     res.set_cookie('rol', request.cookies.get('rol'), max_age=0)
     return res
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

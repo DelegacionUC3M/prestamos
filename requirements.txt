@@ -12,4 +12,4 @@ six==1.10.0
 SQLAlchemy==1.1.5
 Werkzeug==0.11.15
 requests==2.9.1
-pip install Flask-Session
+python-ldap

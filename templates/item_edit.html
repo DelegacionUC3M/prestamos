@@ -8,12 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/objects.css') }}">
+    <link rel="stylesheet" type="text/css" href="/prestamos/static/styles/index.css">
+    <link rel="stylesheet" type="text/css" href="/prestamos/static/styles/objects.css">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="/prestamos/static/img/favicon.ico" />
 
-    <script src="{{ url_for('static', filename='search.js') }}"></script>
+    <script src="/prestamos/static/search.js"></script>
 
     <title>Editar objetos</title>
   </head>
@@ -21,7 +21,7 @@
   <body>
 
     <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
-      <a href="{{ url_for('index') }}" class="navbar-brand">Prestamos</a>
+      <a href="/prestamos/index" class="navbar-brand">Prestamos</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <!-- Dropdown de objetos -->
@@ -30,11 +30,11 @@
               Objetos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('item_create') }}">Añadir</a>
-              <a class="dropdown-item" href="{{ url_for('item_list') }}">Mostrar</a>
-              <a class="dropdown-item" href="{{ url_for('item_edit') }}">Editar</a>
+              <a class="dropdown-item" href="/prestamos/object/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/object/list">Mostrar</a>
+              <a class="dropdown-item" href="/prestamos/object/edit">Editar</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="{{ url_for('item_delete') }}">Borrar</a>
+              <a class="dropdown-item" href="/prestamos/object/delete">Borrar</a>
             </div>
           </li>
           <!-- Dropdown de prestamos -->
@@ -43,10 +43,10 @@
               Prestamos
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('loan_create') }}">Añadir</a>
-              <a class="dropdown-item" href="{{ url_for('loan_list') }}">Mostrar</a>
+              <a class="dropdown-item" href="/prestamos/loan/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/loan/list">Mostrar</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="{{ url_for('loan_delete') }}">Finalizar</a>
+              <a class="dropdown-item" href="/prestamos/loan/delete">Finalizar</a>
             </div>
           </li>
           <!-- Dropdown de prestamos -->
@@ -55,23 +55,23 @@
               Sanciones
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('penalty_create') }}">Añadir</a>
-              <a class="dropdown-item" href="{{ url_for('penalty_list') }}">Mostrar</a>
+              <a class="dropdown-item" href="/prestamos/penalty/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/penalty/list">Mostrar</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="{{ url_for('penalty_delete') }}">Borrar</a>
+              <a class="dropdown-item" href="/prestamos/penalty/delete">Borrar</a>
             </div>
           </li>
         </ul>
         <span class="navbar-text">
-          <img src="{{ url_for('static', filename='img/delegacion.png')}}" alt="Logo Delegacion">
+          <img src="/prestamos/static/img/delegacion.png" alt="Logo Delegacion">
         </span>
         <span class="navbar-text">
-          <a class="dropdown-item" href="{{ url_for('logout') }}">Salir</a>
+          <a class="dropdown-item" href="/prestamos/logout">Salir</a>
         </span>
       </div>
     </nav>
 
-    <form action="{{ request.path }}" method="POST">
+    <form action="/prestamos/object/edit" method="POST">
 
       <!-- TODO: Rellenar los campos del formulario al escoger un objeto en el selector -->
       <div class="input-group mb-3">
@@ -119,7 +119,7 @@
       <input class="input_select" type="submit" value="Guardar">
       <input class="input_select" type="reset" value="Borrar">
 
-      <div id="buscador">
+	<div id="buscador">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <label class="input-group-text" for="inputGroupSelect01">Criterio</label>

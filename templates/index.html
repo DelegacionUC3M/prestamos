@@ -20,7 +20,7 @@
 
     {% if error %}
     <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="errorModalLabel">Error</h5>
@@ -30,6 +30,45 @@
           </div>
           <div class="modal-body">
             {{ error }}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if name or num_tar %}
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="errorModalLabel">Datos</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+		<b>Nombre:</b> {{ name }}</br>
+		<b>Num Tarjeta:</b> {{ num_tar }}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if names_list %}
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="errorModalLabel">Datos</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+		  {% for nombre in names_list %}
+		<b>Nombre:</b> {{ nombre }}</br>
+		  {% endfor %}
           </div>
         </div>
       </div>
@@ -51,7 +90,7 @@
               <a class="dropdown-item" href="/prestamos/object/list">Mostrar</a>
               <a class="dropdown-item" href="/prestamos/object/edit">Editar</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/prestamos/object/delete">Borrar</a>
+              <a class="dropdown-item" href="/prestamos/object/delete">Finalizar</a>
             </div>
           </li>
           <!-- Dropdown de prestamos -->
@@ -75,7 +114,7 @@
               <a class="dropdown-item" href="/prestamos/penalty/create">Añadir</a>
               <a class="dropdown-item" href="/prestamos/penalty/list">Mostrar</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/prestamos/penalty/delete">Borrar</a>
+              <a class="dropdown-item" href="/prestamos/penalty/delete">Finalizar</a>
             </div>
           </li>
           <li>
@@ -119,6 +158,7 @@
         <table id="Tabla" class="table table-hover center">
           <thead>
             <tr>
+	    <!-- <th>Finalizar</th> --!>
               <th>Usuario</th>
               <th>Objeto</th>
               <th>Cantidad</th>
@@ -130,6 +170,7 @@
             {% for item in items %}
             {% if item.id == loan.item_id and loan.refund_date == None %}
             <tr>
+	  <!-- <td><a href="{{ url_for('loan_delete')}}">&#x270e</a></td> --!>
               <td>{{ loan.nia }}</td>
               <td>{{ item.name }}</td>
               <td>{{ loan.amount }}</td>

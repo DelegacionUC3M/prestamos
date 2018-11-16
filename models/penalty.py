@@ -4,7 +4,7 @@ from .connection import db
 class Penalty(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nia = db.Column(db.Integer, nullable=False)
-    loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
+    loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'), nullable=True)
     sanction_date = db.Column(db.Date, nullable=False)
     penalty_date = db.Column(db.Date, nullable=False)
 

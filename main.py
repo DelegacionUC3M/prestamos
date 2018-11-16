@@ -31,6 +31,11 @@ ROL_USER = 10
 ROL_ADMIN = 50
 ROL_MANAGER = 100
 
+# Base query para la busqueda en el ldap
+BASE_DN = "ou=Gente,o=Universidad Carlos III,c=es"
+
+# Servidor para el ldap
+ldap_server = None
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -47,14 +52,14 @@ def login():
             return render_template("login.html", error=error)
 
         # Crea una conexion con el servidor ldap
+        global ldap_server
         ldap_server = ldap.initialize('ldaps://ldap.uc3m.es')
         ldap_server.protocol_version = ldap.VERSION3
         ldap_server.set_option(ldap.OPT_REFERRALS, 0)
 
-        base_dn = "ou=Gente,o=Universidad Carlos III,c=es"
         username = "uid=" + usuario
         # Devuelve una lista con la informacion del alumno buscado
-        result = ldap_server.search_s(base_dn, ldap.SCOPE_SUBTREE, username)
+        result = ldap_server.search_s(BASE_DN, ldap.SCOPE_SUBTREE, username)
         # Si nos podemos conectar con esl usiario y contraseña continuamos
         # Sino se han utilizado credenciales no validos
         try:
@@ -64,22 +69,27 @@ def login():
             query = "SELECT id_person FROM {} WHERE nia={};".format('person',usuario)
             cur.execute(query)
             id_user = cur.fetchone()
-            cur = delegates_db.cursor()
-            query = "SELECT role FROM {} WHERE id_person={};".format('privilege',id_user[0])
-            cur.execute(query)
-            rol_user = cur.fetchone()
 
-            if rol_user:
-                rol = str(rol_user[0])
+            if not id_user:
+                error = "Usuario o contraseña incorrectos"
+                return render_template("login.html", error=error)
             else:
-                rol = "10"
+                cur = delegates_db.cursor()
+                query = "SELECT role FROM {} WHERE id_person={};".format('privilege',id_user[0])
+                cur.execute(query)
+                rol_user = cur.fetchone()
 
-            # Crea una cookie con el rol del usuario valida para 2 horas
-            res = make_response(render_template("index.html",
-                                                items=item.Item.query.all(),
-                                                loans=loan.Loan.query.all()))
-            res.set_cookie('rol', rol, max_age=60*60*2)
-            return res
+                if rol_user:
+                    rol = str(rol_user[0])
+                else:
+                    rol = "10"
+
+                # Crea una cookie con el rol del usuario valida para 2 horas
+                res = make_response(render_template("index.html",
+                                                    items=item.Item.query.all(),
+                                                    loans=loan.Loan.query.all()))
+                res.set_cookie('rol', rol, max_age=60*60*2)
+                return res
         except ldap.INVALID_CREDENTIALS:
             error = "Usuario o contraseña incorrectos"
             return render_template("login.html", error=error)
@@ -173,9 +183,21 @@ def loan_create():
             db_objeto.amount -= cantidad
             db.session.add(loan_data)
             db.session.commit()
+
+            global ldap_server
+            ldap_server = ldap.initialize('ldaps://ldap.uc3m.es')
+            ldap_server.protocol_version = ldap.VERSION3
+            ldap_server.set_option(ldap.OPT_REFERRALS, 0)
+
+            username = "uid=" + str(usuario)
+            result = ldap_server.search_s(BASE_DN, ldap.SCOPE_SUBTREE, username)[0][1]
+            nombre = result['cn'][0].decode("utf-8")
+            num_tarjeta = result['uc3midu'][0].decode("utf-8")
             return render_template("index.html",
                                    items=item.Item.query.all(),
-                                   loans=loan.Loan.query.all())
+                                   loans=loan.Loan.query.all(),
+                                   name=nombre,
+                                   num_tar=num_tarjeta)
         # GET request
     else:
         try:
@@ -209,7 +231,7 @@ def loan_list():
         else:
             res = make_response(render_template('loan_list.html',
                                                 items=item.Item.query.all(),
-                                                loans=loan.Loan.query.filter_by(refund_date=None)))
+                                                loans=loan.Loan.query.all()))
             res.set_cookie('rol', str(user_rol), max_age=60*60*2)
         return res
     except TypeError:
@@ -219,6 +241,8 @@ def loan_list():
         return res
 
 
+# @app.route('/loan/delete', defaults={'loan_id': None}, methods=['GET', 'POST'])
+# @app.route('/loan/delete/<int:loan_id>', methods=['GET', 'POST'])
 @app.route('/loan/delete', methods=['GET', 'POST'])
 def loan_delete():
     """ Marca un préstamo como finalizado."""
@@ -226,17 +250,33 @@ def loan_delete():
         current_date = datetime.date(datetime.now())
         # Lista de los prestamos que se han seleccionado para borrar
         deleted_loans = request.form.getlist("prestamos")
+        names_list = []
+
+        global ldap_server
+        ldap_server = ldap.initialize('ldaps://ldap.uc3m.es')
+        ldap_server.protocol_version = ldap.VERSION3
+        ldap_server.set_option(ldap.OPT_REFERRALS, 0)
+
         for prestamo in deleted_loans:
             db_prestamo = loan.Loan.query.get(int(prestamo))
             objeto = item.Item.query.get(db_prestamo.item_id)
             # Devuelve los objetos prestados a la db
             objeto.amount += db_prestamo.amount
+
+            username = "uid=" + str(db_prestamo.nia)
+            result = ldap_server.search_s(BASE_DN, ldap.SCOPE_SUBTREE, username)[0][1]
+            nombre = result['cn'][0].decode("utf-8")
+            num_tarjeta = result['uc3midu'][0].decode("utf-8")
+            names_list.append(str(nombre))
+
             # Marca el objeto como devuelto
             db_prestamo.refund_date = current_date
             db.session.commit()
+            
         return render_template("index.html",
                                items=item.Item.query.all(),
-                               loans=loan.Loan.query.all())
+                               loans=loan.Loan.query.all(),
+                               names_list=names_list)
     else:
         try:
             user_rol = int(request.cookies.get('rol'))
@@ -378,12 +418,12 @@ def item_delete():
                                loans=loan.Loan.query.all())
     else:
         # Solo se pueden eliminar objetos que no están prestados
-        id_prestamos = []
+        id_prestamos_not_refund = []
         free_items = []
         for prestamo in loan.Loan.query.filter_by(refund_date=None):
-            id_prestamos.append(prestamo.item_id)
+            id_prestamos_not_refund.append(prestamo.item_id)
         for objeto in item.Item.query.filter(item.Item.amount > 0):
-            if objeto.id not in id_prestamos:
+            if objeto.id not in id_prestamos_not_refund:
                 free_items.append(objeto)
 
         try:
@@ -412,7 +452,12 @@ def penalty_create():
     """
     if request.method == 'POST':
         user = request.form['user']
-        db_loan = loan.Loan.query.filter_by(nia=user)
+        try:
+            db_loan = loan.Loan.query.filter_by(nia=user)
+            loan_to_send = db_loan[0].id 
+        except IndexError:
+            loan_to_send = None
+
         sanction = penalty.Penalty.query.filter_by(nia=user)
 
         # Actualizar la fecha final
@@ -425,7 +470,7 @@ def penalty_create():
         else:
             # Se crea una sancion para el usuario
             sancion = penalty.Penalty(user,
-                                      db_loan[0].id,
+                                      loan_to_send,
                                       fecha_sancion,
                                       fecha_final)
             db.session.add(sancion)

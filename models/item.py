@@ -11,7 +11,7 @@ class Item(db.Model):
     loan_days = db.Column(db.Integer, nullable=False)
     penalty_coefficient = db.Column(db.Float, nullable=False)
 
-    def __init__(self, name=None, amount=None, type=None, state=None, penalty_coefficient=None, loan_days=None):
+    def __init__(self, name=None, amount=None, type=None, state=None, loan_days=None, penalty_coefficient=None):
         self.name = name
         self.amount = amount
         self.type = type

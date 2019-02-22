@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 
+	// models "github.com/DelegacionUC3M/prestamos/models"
 	private "github.com/DelegacionUC3M/prestamos/private"
 )
 

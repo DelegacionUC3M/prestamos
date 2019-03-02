@@ -2,17 +2,27 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/gorilla/mux"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 
 	// models "github.com/DelegacionUC3M/prestamos/models"
 	private "github.com/DelegacionUC3M/prestamos/private"
+	routes "github.com/DelegacionUC3M/prestamos/routes"
+)
+
+const (
+	defaultPort = ":8000"
+	tomlFile    = "./config.toml"
 )
 
 func main() {
 
-	privateConfig, err := private.ParseConfig("./config.toml")
+	privateConfig, err := private.ParseConfig(tomlFile)
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +33,23 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Database connection established")
+	defer db.Close()
+	fmt.Println("Database connection established")
 
-	db.Close()
+	r := mux.NewRouter().StrictSlash(true)
+
+	srv := &http.Server{
+		Addr:         "0.0.0.0" + defaultPort,
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      r,
+	}
+
+	r.HandleFunc("/", routes.LoginPage).Methods("GET")
+
+	fmt.Printf("App listening on port %s", defaultPort)
+	if err = srv.ListenAndServe(); err != nil {
+		panic(err)
+	}
 }

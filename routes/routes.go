@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+var (
+	noDataError = ""
+)
+
 // LoginPage asks the user for their credentials
 //
 // If the user is authenticated correctly, redirects to the main page
@@ -52,10 +56,12 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 //
 // Shows a preview of the loans and objects
 func IndexPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+
 	if r.Method == http.MethodPost {
 		r.ParseForm()
 		name := r.FormValue("nia")
-		t, _ := template.ParseFiles("./templates/index.html")
+		t, _ := template.ParseFiles("./templates/index.html", "./templates/navbar.html")
 
 		t.Execute(w, name)
 	} else {
@@ -65,7 +71,7 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		t, _ := template.ParseFiles("./templates/index.html")
+		t, _ := template.ParseFiles("./templates/index.html", "./templates/navbar.html")
 		t.Execute(w, cookie.Value)
 		// fmt.Fprint(w, fmt.Sprintf("<h1>Hello %s</h1>"))
 	}

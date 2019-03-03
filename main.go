@@ -27,9 +27,9 @@ func main() {
 		panic(err)
 	}
 
-	dbconn := private.CreateDbInfo(privateConfig)
+	dbLoansConn := private.CreateDbInfo(privateConfig.Loans)
 
-	db, err := gorm.Open("postgres", dbconn)
+	db, err := gorm.Open("postgres", dbLoansConn)
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +46,8 @@ func main() {
 		Handler:      r,
 	}
 
-	r.HandleFunc("/", routes.LoginPage).Methods("GET")
+	r.HandleFunc("/", routes.LoginPage).Methods("GET", "POST")
+	r.HandleFunc("/index", routes.IndexPage).Methods("GET", "POST")
 
 	fmt.Printf("App listening on port %s", defaultPort)
 	if err = srv.ListenAndServe(); err != nil {

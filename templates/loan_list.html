@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+    <link rel="stylesheet" type="text/css" href="/prestamos/static/styles/index.css">
+    <link rel="stylesheet" type="text/css" href="/prestamos/static/styles/objects.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/prestamos/static/img/favicon.ico" />
+
+    <script src="/prestamos/static/search.js"></script>
+    <meta charset="UTF-8">
+    <title>Listar préstamos</title>
+  </head>
+
+  <body>
+    <nav class="shadow-lg navbar navbar-expand-lg navbar-light bg-light">
+      <a href="/index" class="navbar-brand">Prestamos</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/prestamos/object/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/object/list">Mostrar</a>
+              <a class="dropdown-item" href="/prestamos/object/edit">Editar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/prestamos/object/delete">Finalizar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/prestamos/loan/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/loan/list">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/prestamos/loan/delete">Finalizar</a>
+            </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/prestamos/penalty/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/penalty/list">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/prestamos/penalty/delete">Finalizar</a>
+            </div>
+          </li>
+        </ul>
+        <span class="navbar-text">
+          <img src="/prestamos/static/img/delegacion.png" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="/prestamos/logout">Salir</a>
+        </span>
+      </div>
+    </nav>
+
+    <div id="container">
+      <div id="buscador">
+        <div class="input-group mb-3" style="margin-left:20vw; width:52vw">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Criterio</label>
+            <select class="custom-select" id="Opciones">
+              <option value="0">Usuario</option>
+              <option value="1">Objeto</option>
+              <option value="2">Cantidad</option>
+              <option value="3">Fecha</option>
+              <option value="4">Devolución</option>
+            </select>
+          </div>
+            <input type="text" style="width:500px" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
+        </div>
+      </div><!-- Div Buscador -->
+
+      <div id="TableContainer">
+        <table id="Tabla" class="table table-hover center">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Objeto prestado</th>
+              <th>Cantidad</th>
+              <th>Fecha del préstamo</th>
+              <th>Fecha de devolución</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for loan in loans %}
+            {% for item in items %}
+            {% if item.id == loan.item_id %}
+            <tr>
+              <td>{{ loan.nia }}</td>
+              {% if item.name is none %}
+              	<td></td>
+              {% else %}
+              	<td>{{ item.name }}</td>
+	      {% endif %}
+              <td>{{ loan.amount }}</td>
+              <td>{{ loan.loan_date }}</td>
+              {% if loan.refund_date is none %}
+              	<td></td>
+              {% else %}
+              	<td>{{ loan.refund_date }}</td>
+              {% endif %}
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

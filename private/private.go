@@ -13,10 +13,15 @@ type Database struct {
 	Password string
 }
 
-// ParseConfig parses the config for the database
-func ParseConfig(file string) (Database, error) {
+type Databases struct {
+	Loans Database
+	Users Database
+}
 
-	var tomlConfig Database
+// ParseConfig parses the config for the database
+func ParseConfig(file string) (Databases, error) {
+
+	var tomlConfig Databases
 	_, err := toml.DecodeFile(file, &tomlConfig)
 
 	return tomlConfig, err

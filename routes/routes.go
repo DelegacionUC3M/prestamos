@@ -8,29 +8,25 @@ import (
 	"time"
 )
 
-// From the go wiki https://golang.org/doc/articles/wiki/
-// func loadPage(title string) (*Page, error) {
-//     filename := title + ".txt"
-//     body, err := ioutil.ReadFile(filename)
-//     if err != nil {
-//         return nil, err
-//     }
-//     return &Page{Title: title, Body: body}, nil
-// }
-// And then in a handler function
-//     p, err := loadPage(title)
-//     t, _ := template.ParseFiles("edit.html")
-//     t.Execute(w, p)
-
 // LoginPage asks the user for their credentials
 //
 // If the user is authenticated correctly, redirects to the main page
 func LoginPage(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	t, _ := template.ParseFiles("./templates/index.html")
+
+	switch r.Method {
+	case http.MethodPost:
 		// TODO: Obtain the user role from the db
 		r.ParseForm()
 		name := r.FormValue("nia")
-		// t, _ := template.ParseFiles("./templates/index.html")
+
+		// if err := auth.CheckUserRol(name); err != nil {
+		//     error = ...
+		//     t.Execute(w, error)
+		// }
+
 		expire := time.Now().AddDate(0, 0, 1)
 		cookie := http.Cookie{
 			Name:    "role",
@@ -38,17 +34,18 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 			Expires: expire,
 		}
 		http.SetCookie(w, &cookie)
-		http.Redirect(w, r, "/index", http.StatusSeeOther)
-	} else {
 
+		t.Execute(w, name)
+
+	case http.MethodGet:
 		body, err := ioutil.ReadFile("./templates/login.html")
 		if err != nil {
 			panic(err)
 		}
-
 		fmt.Fprintf(w, string(body))
-	}
 
+		// t.Execute(w, "")
+	}
 }
 
 // IndexPage is the main page for the application
@@ -59,6 +56,7 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		name := r.FormValue("nia")
 		t, _ := template.ParseFiles("./templates/index.html")
+
 		t.Execute(w, name)
 	} else {
 

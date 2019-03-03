@@ -46,10 +46,10 @@ func main() {
 		Handler:      r,
 	}
 
-	r.HandleFunc("/", routes.LoginPage).Methods("GET", "POST")
+	r.HandleFunc("/login", routes.LoginPage).Methods("GET", "POST")
 	r.HandleFunc("/index", routes.IndexPage).Methods("GET", "POST")
 
-	fmt.Printf("App listening on port %s", defaultPort)
+	fmt.Printf("App listening on port %s\n", defaultPort)
 	if err = srv.ListenAndServe(); err != nil {
 		panic(err)
 	}

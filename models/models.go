@@ -18,9 +18,9 @@ type Item struct {
 // Loan stores a loan made from a user
 type Loan struct {
 	ID         uint `gorm:"primary_key" gorm:"AUTO_INCREMENT"`
-	ItemID     int
-	Item       Item
-	Nia        int
+	Item       Item `gorm:"foreignkey:ItemID"`
+	ItemID     int 
+	Nia        int 'gorm:"not null"'
 	Amount     int
 	LoanDate   time.Time
 	RefundDate time.Time

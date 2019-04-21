@@ -20,7 +20,11 @@ const (
 	tomlFile    = "./config.toml"
 )
 
+var db *gorm.DB
+
 func main() {
+
+	var err error
 
 	privateConfig, err := private.ParseConfig(tomlFile)
 	if err != nil {
@@ -29,7 +33,7 @@ func main() {
 
 	dbLoansConn := private.CreateDbInfo(privateConfig.Loans)
 
-	db, err := gorm.Open("postgres", dbLoansConn)
+	db, err = gorm.Open("postgres", dbLoansConn)
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +41,7 @@ func main() {
 	fmt.Println("Database connection established")
 
 	r := mux.NewRouter().StrictSlash(true)
-	r = r.PathPrefix("/prestamos").Subrouter()
+	// r = r.PathPrefix("/prestamos").Subrouter()
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0" + defaultPort,
@@ -47,7 +51,7 @@ func main() {
 		Handler:      r,
 	}
 
-	r.Handle("/static", http.FileServer(http.Dir("./static/")))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	r.HandleFunc("/login", routes.LoginPage).Methods("GET", "POST")
 	r.HandleFunc("/index", routes.IndexPage).Methods("GET", "POST")
 

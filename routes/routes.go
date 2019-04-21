@@ -73,6 +73,5 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 
 		t, _ := template.ParseFiles("./templates/index.html", "./templates/navbar.html")
 		t.Execute(w, cookie.Value)
-		// fmt.Fprint(w, fmt.Sprintf("<h1>Hello %s</h1>"))
 	}
 }

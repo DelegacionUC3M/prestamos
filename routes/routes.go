@@ -2,6 +2,8 @@ package routes
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +14,27 @@ var (
 	noDataError = ""
 )
 
+var (
+	logger = createLogger()
+	logFile     = "./prestamos.log"
+)
+
+func createLogger() *log.Logger {
+	lf, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0640)
+	if err != nil {
+		log.Fatal("No se pudo abrir el archivo de log:", err)
+	}
+	return log.New(lf, "[Prestamos] ", log.LstdFlags)	
+}
+
+// TODO: Use the error into the template
+func returnToLogin(w http.ResponseWriter) {
+	body, err := ioutil.ReadFile("./templates/login.html")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprintf(w, string(body))
+}
 // LoginPage asks the user for their credentials
 //
 // If the user is authenticated correctly, redirects to the main page
@@ -22,6 +45,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
+		logger.Printf("POST %s", r.URL)
 		// TODO: Obtain the user role from the db
 		r.ParseForm()
 		name := r.FormValue("nia")
@@ -42,13 +66,8 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, name)
 
 	case http.MethodGet:
-		body, err := ioutil.ReadFile("./templates/login.html")
-		if err != nil {
-			panic(err)
-		}
-		fmt.Fprintf(w, string(body))
-
-		// t.Execute(w, "")
+		logger.Printf("GET %s", r.URL)
+		returnToLogin(w)
 	}
 }
 
@@ -59,16 +78,17 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
 	if r.Method == http.MethodPost {
+		logger.Printf("POST %s", r.URL)
 		r.ParseForm()
-		name := r.FormValue("nia")
+		nia := r.FormValue("nia")
 		t, _ := template.ParseFiles("./templates/index.html", "./templates/navbar.html")
 
-		t.Execute(w, name)
+		t.Execute(w, nia)
 	} else {
-
+		logger.Printf("GET %s", r.URL)
 		cookie, err := r.Cookie("role")
 		if err != nil {
-			panic(err)
+			returnToLogin(w)
 		}
 
 		t, _ := template.ParseFiles("./templates/index.html", "./templates/navbar.html")

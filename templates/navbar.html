@@ -1,17 +1,54 @@
 {{define "navbar"}}
-<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="errorModalLabel">Error</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a href="/prestamos/index" class="navbar-brand">Prestamos</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!-- Dropdown de objetos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Objetos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/prestamos/object/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/object/list">Mostrar</a>
+              <a class="dropdown-item" href="/prestamos/object/edit">Editar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/prestamos/object/delete">Finalizar</a>
             </div>
-            <div class="modal-body">
-              {{.}}
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Prestamos
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/prestamos/loan/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/loan/list">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/prestamos/loan/delete">Finalizar</a>
             </div>
-          </div>
-        </div>
+          </li>
+          <!-- Dropdown de prestamos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sanciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/prestamos/penalty/create">Añadir</a>
+              <a class="dropdown-item" href="/prestamos/penalty/list">Mostrar</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/prestamos/penalty/delete">Finalizar</a>
+            </div>
+          </li>
+          <li>
+          </li>
+        </ul>
+        <span class="navbar-text">
+          <img src="/prestamos/static/img/delegacion.png" alt="Logo Delegacion">
+        </span>
+        <span class="navbar-text">
+          <a class="dropdown-item" href="/prestamos/logout">Salir</a>
+        </span>
       </div>
+</nav>
 {{end}}

@@ -18,13 +18,15 @@ import (
 const (
 	defaultPort = ":8000"
 	tomlFile    = "./config.toml"
+
 )
 
-var db *gorm.DB
+var (
+	db *gorm.DB
+	err error
+)
 
 func main() {
-
-	var err error
 
 	privateConfig, err := private.ParseConfig(tomlFile)
 	if err != nil {
@@ -39,9 +41,8 @@ func main() {
 	}
 	defer db.Close()
 	fmt.Println("Database connection established")
-
+	
 	r := mux.NewRouter().StrictSlash(true)
-	// r = r.PathPrefix("/prestamos").Subrouter()
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0" + defaultPort,

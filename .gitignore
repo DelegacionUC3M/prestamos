@@ -5,3 +5,4 @@ __pycache__/
 tags
 config.toml
 prestamos
+prestamos.log

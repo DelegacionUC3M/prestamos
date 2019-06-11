@@ -15,15 +15,11 @@ import (
 	routes "github.com/DelegacionUC3M/prestamos/routes"
 )
 
+// Defualt configuration options
 const (
 	defaultPort = ":8000"
 	tomlFile    = "./config.toml"
 
-)
-
-var (
-	db *gorm.DB
-	err error
 )
 
 func main() {
@@ -35,15 +31,21 @@ func main() {
 
 	dbLoansConn := private.CreateDbInfo(privateConfig.Loans)
 
-	db, err = gorm.Open("postgres", dbLoansConn)
+	db, err := gorm.Open("postgres", dbLoansConn)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+	// TODO: Change fmt to log
 	fmt.Println("Database connection established")
-	
-	r := mux.NewRouter().StrictSlash(true)
 
+	Routes := new(routes.RouteStruct)
+	Routes.DB = db
+	
+	// Create the database schema
+	// db.AutoMigrate(&models.Item{}, &models.Loan{}, &models.Penalty{})
+
+	r := mux.NewRouter().StrictSlash(true)
 	srv := &http.Server{
 		Addr:         "0.0.0.0" + defaultPort,
 		WriteTimeout: time.Second * 15,
@@ -53,9 +55,13 @@ func main() {
 	}
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	r.HandleFunc("/login", routes.LoginPage).Methods("GET", "POST")
-	r.HandleFunc("/index", routes.IndexPage).Methods("GET", "POST")
+	
+	r.HandleFunc("/login", Routes.LoginPage).Methods("GET", "POST")
+	r.HandleFunc("/index", Routes.IndexPage).Methods("GET", "POST")
 
+	r.HandleFunc("/item/create", Routes.ItemCreate).Methods("GET", "POST")
+
+	
 	fmt.Printf("App listening on port %s\n", defaultPort)
 	if err = srv.ListenAndServe(); err != nil {
 		panic(err)

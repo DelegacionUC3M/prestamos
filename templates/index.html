@@ -16,15 +16,66 @@
     <title>Inicio</title>
   </head>
 
-<body>
+  <body>
 
-{{template "navbar" .}}
-{{template "modal" .}}
+    {{template "navbar" .}}
+    {{template "modal" .Modal}}
 
-{{range .Items}}
-{{end}}
+    <!-- Start left container -->
+    <div id="container" style="width:100%;">                                   
+      <div id="left" style="float:left; width:50%;">
+        <table id="Tabla" class="table table-hover center">
+          <thead>
+            <tr>
+              <th>Objeto</th>
+              <th>Estado</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Items}}
+            {{if .Name}}
+            <tr>
+              <td>{{.Name }}</td>
+              <td>{{.State }}</td>
+              <td>{{.Amount }}</td>
+            </tr>
+            {{end}}
+            {{end}}
+          </tbody>
 
-{{range .Loans}}
-{{end}}
-</body>
+        </table>
+      </div>
+      <!-- End Left container -->
+
+      <!-- Start Right container -->
+      <div id="right" style="float:right; width:50%;">
+        <table id="Tabla" class="table table-hover center">
+          <thead>
+            <tr>
+	          <th>Finalizar</th>
+              <th>Usuario</th>
+              <th>Objeto</th>
+              <th>Cantidad</th>
+              <th>Fecha inicial</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Loans}}
+            {{if .Nia}}
+            <tr>
+	          <td><a href="/loan/delete/.ID">&#x270e</a></td>
+              <td>{{.Nia}}</td>
+              <td>{{.Name}}</td>
+              <td>{{.Amount}}</td>
+              <td>{{.LoanDate}}</td>
+            </tr>
+            {{end}}
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      <!-- End Right container -->
+      
+  </body>
 </html>

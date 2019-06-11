@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+    <link rel="stylesheet" type="text/css" href="/static/styles/index.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/objects.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
+
+    <script src="/prestamos/static/search.js"></script>
+
+    <title>Crear objeto</title>
+  </head>
+
+  <body>
+
+    {{template "navbar" .}}
+
+    <form action="/item/create" method="POST">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Nombre</span>
+        </div>
+        <input name="name" type="text" class="form-control" placeholder="Nombre del objeto" aria-label="Nombre" aria-describedby="basic-addon1" required="true">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Cantidad</span>
+        </div>
+        <input name="amount" type="number" class="form-control" placeholder="Cantidad inicial" aria-label="Cantidad" aria-describedby="basic-addon1" required="true" min="0">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Tipo</span>
+        </div>
+        <input name="type" type="text" class="form-control" placeholder="Electrónico, papeleria..." aria-label="Cantidad" aria-describedby="basic-addon1"  required="true">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Estado</span>
+        </div>
+        <input name="state" type="text" class="form-control" placeholder="Defectuoso, funciona..." aria-label="Cantidad" aria-describedby="basic-addon1" required="true">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Días</span>
+        </div>
+        <input name="loan_days" type="number" class="form-control" placeholder="Duración del prestamo" aria-label="Cantidad" aria-describedby="basic-addon1" required="true" min="0">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Penalización</span>
+        </div>
+        <input name="penalty_coefficient" type="number" class="form-control" placeholder="Ratio de penalización" aria-label="Cantidad" aria-describedby="basic-addon1" required="true" min="0" step="1">
+      </div>
+
+      <input class="input_select" type="submit" value="Guardar">
+      <input class="input_select" type="reset" value="Finalizar">
+    </form>
+
+  </body>
+</html>

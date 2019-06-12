@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script> 
+
+    <link rel="stylesheet" type="text/css" href="/static/styles/index.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/objects.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="//static/img/favicon.ico" />
+
+    <script src="/static/search.js"></script>
+
+    <title>Crear préstamo</title>
+  </head>
+
+  <body>
+
+    {{template "navbar" .}}
+    
+    <form action="/loan/create" method="POST">
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="user_prepend">Usuario</span>
+        </div>
+        <input type="number" class="form-control" placeholder="Nia del usuario" aria-label="Nombre" aria-describedby="basic-addon1" name="user" required="true" min="100000000" max="100999999">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="user_prepend">Cantidad</span>
+        </div>
+        <input type="number" class="form-control" placeholder="Nia del usuario" aria-label="Cantidad" aria-describedby="basic-addon1" name="amount" required="true" min="0" value="1">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="fdate_prepend">Fecha inicial</span>
+        </div>
+        <input type="date" class="form-control" placeholder="Fecha del prestamo" aria-label="Fecha" aria-describedby="basic-addon1" name="loan_date" required="true" id="form_date">
+      </div>
+
+      <input class="input_select" type="submit" value="Guardar">
+      <input class="input_select" type="reset" value="Finalizar">
+
+      <div id="buscador">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Criterio</label>
+            <select class="custom-select" id="Opciones">
+              <option value="1">Nombre</option>
+              <option value="2">Cantidad</option>
+              <option value="3">Estado</option>
+              <option value="4">Tipo</option>
+              <option value="5">Dias</option>
+              <option value="6">Coeficiente</option>
+            </select>
+          </div>
+          <input type="text" id="Buscador" onkeyup="searchItem()" placeholder="Buscar" class="form-control" aria-label="Text input with dropdown button">
+        </div>
+      </div><!-- Div Buscador -->
+
+
+      <table class="table table-hover center" id="Tabla">
+        <thead>
+          <tr>
+            <th>Seleccion</th>
+            <th>Objeto</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Duración préstamo</th>
+            <th>% penalizacion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .}}
+          <tr>
+            <td><input type="radio" required="true" value="{{.ID}}" name="objeto"></td>
+            <td>{{.Name }}</td>
+            <td>{{.Amount }}</td>
+            <td>{{.State }}</td>
+            <td>{{.Type }}</td>
+            <td>{{.LoanDays }}</td>
+            <td>{{.PenaltyCoefficient }}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+
+    </form>
+
+  </body>
+</html>

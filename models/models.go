@@ -27,6 +27,7 @@ type Loan struct {
 	Amount     int
 	LoanDate   time.Time
 	RefundDate time.Time
+	Finished   bool `gorm:"default:false"`
 }
 
 // Penalty stores a sanction from a user

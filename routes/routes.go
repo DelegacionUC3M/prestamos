@@ -22,6 +22,10 @@ var (
 	logFile = "./prestamos.log"
 )
 
+var (
+	loc, _ = time.LoadLocation("Europe/Madrid")
+)
+
 // RouteStruct allows us to pass the db handle without problem
 // We only need to instantiate one object since all routes can be accessed as methods
 type RouteStruct struct {
@@ -48,7 +52,7 @@ func (R *RouteStruct) GatherIndexInfo(info *IndexInfo) {
 		itemholder models.Item
 		loanholder models.Loan
 	)
-	
+
 	itemsRows, err := R.DB.Model(&models.Item{}).Where("amount = 0").Rows()
 	if err != nil {
 		panic(err)
@@ -60,7 +64,7 @@ func (R *RouteStruct) GatherIndexInfo(info *IndexInfo) {
 		info.Items = append(info.Items, itemholder)
 	}
 	
-	loansRows, err := R.DB.Model(&models.Loan{}).Where("refund_date is null").Rows()
+	loansRows, err := R.DB.Model(&models.Loan{}).Where("finished = ?", "false").Rows()
 	if err != nil {
 		panic(err)
 	}
@@ -68,6 +72,10 @@ func (R *RouteStruct) GatherIndexInfo(info *IndexInfo) {
 
 	for loansRows.Next() {
 		R.DB.ScanRows(loansRows, &loanholder)
+		// FIXME: Parsing between different formats
+		// loanholder.LoanDate, _ = time.ParseInLocation("01-02-2006 15:04:05", loanholder.LoanDate.String(), loc)
+		// loanholder.RefundDate, _ = time.ParseInLocation("01-02-2006 15:04:05", loanholder.RefundDate.String(), loc)
+
 		info.Loans = append(info.Loans, loanholder)
 	}
 }
@@ -171,4 +179,46 @@ func (R *RouteStruct) ItemCreate(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("GET %s %s", r.URL, r.RemoteAddr)
 		TItemCreate.Execute(w, "")
 	}
+}
+
+func (R *RouteStruct) LoanCreate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	
+	var loanholder models.Loan
+	
+	if r.Method == http.MethodPost {
+		logger.Printf("POST %s %s", r.URL, r.RemoteAddr)
+		r.ParseForm()
+		loanholder.ItemID, _ = strconv.Atoi(r.FormValue("objeto"))
+		loanholder.Nia, _ = strconv.Atoi(r.FormValue("user"))
+		loanholder.Amount, _ = strconv.Atoi(r.FormValue("amount"))
+		t, _ := time.ParseInLocation("01-02-2006", r.FormValue("loan_date"), loc)
+		loanholder.LoanDate = t
+		R.DB.Create(&loanholder)
+
+		indexInfo := NewIndexInfo()
+		R.GatherIndexInfo(&indexInfo)
+		TIndex.Execute(w, indexInfo)
+		
+	} else {
+		logger.Printf("GET %s %s", r.URL, r.RemoteAddr)
+
+		var (
+			itemholder models.Item
+			itemlist []models.Item
+		)
+		
+		itemsRows, err := R.DB.Model(&models.Item{}).Rows()
+		if err != nil {
+			panic(err)
+		}
+		defer itemsRows.Close()
+
+		for itemsRows.Next() {
+			R.DB.ScanRows(itemsRows, &itemholder)
+			itemlist = append(itemlist, itemholder)
+		}
+		TLoanCreate.Execute(w, itemlist)
+	}
+
 }

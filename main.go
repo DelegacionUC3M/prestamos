@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 
-	// models "github.com/DelegacionUC3M/prestamos/models"
+	models "github.com/DelegacionUC3M/prestamos/models"
 	private "github.com/DelegacionUC3M/prestamos/private"
 	routes "github.com/DelegacionUC3M/prestamos/routes"
 )
@@ -43,7 +43,13 @@ func main() {
 	Routes.DB = db
 	
 	// Create the database schema
-	// db.AutoMigrate(&models.Item{}, &models.Loan{}, &models.Penalty{})
+	db.AutoMigrate(&models.Item{}, &models.Loan{}, &models.Penalty{})
+
+	// itemOne := models.Item{Name:"Test", Amount:0, Type:"Testing", State:"Func", LoanDays:5, PenaltyCoefficient: 4}
+	// itemTwo := models.Item{Name:"Objeto", Amount:5, Type:"Lab", State:"Roto", LoanDays:3, PenaltyCoefficient: 2}
+	
+	// db.Create(&itemOne)
+	// db.Create(&itemTwo)
 
 	r := mux.NewRouter().StrictSlash(true)
 	srv := &http.Server{
@@ -60,6 +66,8 @@ func main() {
 	r.HandleFunc("/index", Routes.IndexPage).Methods("GET", "POST")
 
 	r.HandleFunc("/item/create", Routes.ItemCreate).Methods("GET", "POST")
+	
+	r.HandleFunc("/loan/create", Routes.LoanCreate).Methods("GET", "POST")
 
 	
 	fmt.Printf("App listening on port %s\n", defaultPort)
